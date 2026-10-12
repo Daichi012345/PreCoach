@@ -142,6 +142,18 @@ vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
 .vite/
 
+# Python
+back/.venv/
+__pycache__/
+*.pyc
+
+# React
+front/node_modules/
+
+# 環境変数・APIキー
+.env
+.env.*
+
 
 # Pythonの仮想環境・キャッシュ
 .venv/
