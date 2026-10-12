@@ -26,6 +26,7 @@
   font-size: 16px;
   font-weight: 700;
   line-height: 1.25;
+  text-decoration: none;
 }
 
 .analysis-nav {
@@ -36,6 +37,17 @@
   color: #8290a5;
   font-size: 8px;
   line-height: 1.3;
+}
+
+.analysis-nav a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.analysis-nav a:hover {
+  color: #263247;
+  text-decoration: underline;
+  text-underline-offset: 2px;
 }
 
 .analysis-content h1 {
@@ -116,6 +128,7 @@
 }
 
 .analysis-repeat-button {
+  display: inline-block;
   margin-top: 12px;
   padding: 6px 8px;
   border: 1px solid #2d2d2d;
@@ -126,6 +139,7 @@
   font: inherit;
   font-size: 9px;
   line-height: 1.25;
+  text-decoration: none;
 }
 
 .analysis-repeat-button:hover {

@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import './PracticeHistoryPage.css'
 
 const practiceHistory = [
@@ -8,21 +7,22 @@ const practiceHistory = [
 ]
 
 function PracticeHistoryPage() {
-  const [message, setMessage] = useState('')
-
   return (
     <main className="history-shell">
+      <p className="history-breadcrumb">PreCoach / 05 練習履歴</p>
       <div className="history-page">
         <header className="history-header">
-          <p className="history-brand">PreCoach</p>
+          <a className="history-brand" href="/dashboard">
+            PreCoach
+          </a>
           <nav className="history-nav" aria-label="メインメニュー">
-            <span>ホーム</span>
+            <a href="/dashboard">Dashboard</a>
             <span aria-hidden="true">/</span>
-            <span>練習を始める</span>
+            <a href="/practice-settings">練習を始める</a>
             <span aria-hidden="true">/</span>
-            <span>練習履歴</span>
+            <a href="/practice-history">練習履歴</a>
             <span aria-hidden="true">/</span>
-            <span>設定</span>
+            <a href="/practice-settings">設定</a>
           </nav>
         </header>
 
@@ -58,26 +58,19 @@ function PracticeHistoryPage() {
           </section>
 
           <div className="history-actions">
-            <button
+            <a
               className="history-button"
-              type="button"
-              onClick={() => setMessage('練習結果の表示機能は現在準備中です。')}
+              href="/analysis-result"
             >
               結果を開く
-            </button>
-            <button
+            </a>
+            <a
               className="history-button"
-              type="button"
-              onClick={() => setMessage('成長記録の表示機能は現在準備中です。')}
+              href="/growth-record"
             >
               成長記録・改善点の履歴を見る
-            </button>
+            </a>
           </div>
-          {message && (
-            <p className="history-message" role="status">
-              {message}
-            </p>
-          )}
         </section>
 
         <footer className="history-footer">

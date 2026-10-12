@@ -1,0 +1,428 @@
+/*
+ * Shared visual language for every application screen.
+ * Page-specific styles remain responsible for content layout.
+ */
+.dashboard-shell,
+.practice-settings-shell,
+.practice-shell,
+.growth-record-shell,
+.analysis-shell,
+.history-shell {
+  box-sizing: border-box;
+  min-height: 100svh;
+  padding: 28px 32px;
+  color: #1e293b;
+  background: #eef2f7;
+}
+
+.page-shell {
+  box-sizing: border-box;
+  min-height: 100svh;
+  padding: 28px 32px;
+  color: #1e293b;
+  background: #eef2f7;
+}
+
+.page-breadcrumb,
+.analysis-breadcrumb,
+.history-breadcrumb {
+  max-width: 1200px;
+  margin: 0 auto 16px;
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.dashboard-page,
+.practice-settings-page,
+.practice-page,
+.growth-record-page,
+.analysis-page,
+.history-page,
+.page {
+  box-sizing: border-box;
+  width: 100%;
+  max-width: 1200px;
+  min-height: calc(100svh - 110px);
+  margin: 0 auto;
+  padding: 32px 40px 48px;
+  border: 1px solid #e2e8f0;
+  border-radius: 16px;
+  background: #f8fafc;
+  box-shadow: 0 8px 30px rgb(15 23 42 / 5%);
+}
+
+.dashboard-header,
+.practice-settings-header,
+.practice-header,
+.growth-record-header,
+.analysis-header,
+.history-header {
+  margin-bottom: 32px;
+  padding-bottom: 20px;
+  border-bottom: 1px solid #e2e8f0;
+}
+
+.dashboard-brand,
+.practice-settings-brand,
+.practice-brand,
+.growth-record-brand,
+.analysis-brand,
+.history-brand,
+.brand-name {
+  color: #1d4ed8;
+  font-size: 24px;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.dashboard-nav,
+.practice-settings-nav,
+.practice-nav,
+.growth-record-nav,
+.analysis-nav,
+.history-nav,
+.page-navigation {
+  gap: 12px 20px;
+  margin-top: 12px;
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.dashboard-nav a,
+.practice-settings-nav a,
+.practice-nav a,
+.growth-record-nav a,
+.analysis-nav a,
+.history-nav a,
+.page-navigation a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.dashboard-nav a:hover,
+.practice-settings-nav a:hover,
+.practice-nav a:hover,
+.growth-record-nav a:hover,
+.analysis-nav a:hover,
+.history-nav a:hover,
+.page-navigation a:hover {
+  color: #2563eb;
+  text-decoration: none;
+}
+
+.dashboard-content h1,
+.practice-settings-content h1,
+.practice-content h1,
+.growth-record-content h1,
+.analysis-content h1,
+.history-content h1,
+.page-title {
+  margin: 0 0 24px;
+  color: #0f172a;
+  font-size: 28px;
+  font-weight: 800;
+  line-height: 1.3;
+}
+
+.welcome-card,
+.stats-card,
+.presentation-card,
+.settings-card,
+.recording-status,
+.camera-card,
+.measurement-card,
+.growth-card,
+.analysis-card,
+.history-card,
+.auth-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 14px;
+  background: #fff;
+  box-shadow: 0 4px 14px rgb(15 23 42 / 4%);
+}
+
+.welcome-card,
+.settings-card,
+.camera-card,
+.measurement-card,
+.growth-card,
+.analysis-card,
+.history-card,
+.auth-card {
+  padding: 26px 28px;
+}
+
+.practice-button,
+.start-practice-button,
+.stop-recording-button,
+.analysis-repeat-button,
+.history-button {
+  min-height: 44px;
+  padding: 12px 22px;
+  border: 1px solid #2563eb;
+  border-radius: 9px;
+  background: #2563eb;
+  color: #fff;
+  font-size: 15px;
+  font-weight: 700;
+  line-height: 1.4;
+  text-decoration: none;
+}
+
+.practice-button:hover,
+.start-practice-button:hover,
+.stop-recording-button:hover:not(:disabled),
+.analysis-repeat-button:hover,
+.history-button:hover {
+  border-color: #1d4ed8;
+  background: #1d4ed8;
+}
+
+.dashboard-footer,
+.practice-settings-footer,
+.practice-footer,
+.analysis-footer,
+.history-footer,
+.page-footer {
+  gap: 12px 20px;
+  margin-top: 30px;
+  padding-top: 20px;
+  border-top: 1px solid #e2e8f0;
+  color: #94a3b8;
+  font-size: 12px;
+  line-height: 1.6;
+}
+
+.practice-settings-shell > .practice-settings-breadcrumb,
+.practice-shell > .practice-breadcrumb,
+.growth-record-shell > .growth-record-breadcrumb {
+  max-width: 1200px;
+  margin: 0 auto 16px;
+  color: #64748b;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+.practice-settings-content h2,
+.practice-content h2,
+.growth-record-content h2,
+.analysis-content h2,
+.history-content h2 {
+  color: #0f172a;
+}
+
+.practice-settings-content p,
+.practice-content p,
+.growth-record-content p,
+.analysis-content p,
+.history-content p {
+  color: #64748b;
+}
+
+.page {
+  min-height: calc(100svh - 56px);
+}
+
+.page-title {
+  margin-top: 24px;
+}
+
+.auth-card {
+  padding: 26px 28px;
+}
+
+.action-button {
+  min-height: 44px;
+  border: 1px solid #2563eb;
+  border-radius: 9px;
+  background: #2563eb;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.action-button:hover {
+  border-color: #1d4ed8;
+  background: #1d4ed8;
+}
+
+@media (max-width: 768px) {
+  .dashboard-shell,
+  .practice-settings-shell,
+  .practice-shell,
+  .growth-record-shell,
+  .analysis-shell,
+  .history-shell {
+    padding: 16px;
+  }
+
+  .page-shell {
+    padding: 16px;
+  }
+
+  .dashboard-page,
+  .practice-settings-page,
+  .practice-page,
+  .growth-record-page,
+  .analysis-page,
+  .history-page,
+  .page {
+    min-height: calc(100svh - 80px);
+    padding: 24px 20px;
+    border-radius: 12px;
+  }
+
+  .dashboard-header,
+  .practice-settings-header,
+  .practice-header,
+  .growth-record-header,
+  .analysis-header,
+  .history-header {
+    margin-bottom: 24px;
+  }
+
+  .dashboard-brand,
+  .practice-settings-brand,
+  .practice-brand,
+  .growth-record-brand,
+  .analysis-brand,
+  .history-brand,
+  .brand-name {
+    font-size: 22px;
+  }
+
+  .dashboard-nav,
+  .practice-settings-nav,
+  .practice-nav,
+  .growth-record-nav,
+  .analysis-nav,
+  .history-nav,
+  .page-navigation {
+    gap: 10px 16px;
+    font-size: 13px;
+  }
+
+  .dashboard-content h1,
+  .practice-settings-content h1,
+  .practice-content h1,
+  .growth-record-content h1,
+  .analysis-content h1,
+  .history-content h1,
+  .page-title {
+    font-size: 24px;
+  }
+
+  .welcome-card,
+  .settings-card,
+  .camera-card,
+  .measurement-card,
+  .growth-card,
+  .analysis-card,
+  .history-card,
+  .auth-card {
+    padding: 20px;
+  }
+}
+
+@media (max-width: 480px) {
+  .dashboard-shell,
+  .practice-settings-shell,
+  .practice-shell,
+  .growth-record-shell,
+  .analysis-shell,
+  .history-shell {
+    padding: 10px;
+  }
+
+  .page-shell {
+    padding: 10px;
+  }
+
+  .dashboard-page,
+  .practice-settings-page,
+  .practice-page,
+  .growth-record-page,
+  .analysis-page,
+  .history-page,
+  .page {
+    padding: 20px 16px;
+  }
+
+  .practice-button,
+  .start-practice-button,
+  .analysis-repeat-button {
+    width: 100%;
+  }
+}
+
+@media (min-width: 801px) {
+  .practice-settings-shell,
+  .practice-shell,
+  .growth-record-shell,
+  .analysis-shell,
+  .history-shell,
+  .page-shell {
+    padding: 0;
+  }
+
+  .practice-settings-shell > .practice-settings-breadcrumb,
+  .practice-shell > .practice-breadcrumb,
+  .growth-record-shell > .growth-record-breadcrumb,
+  .analysis-breadcrumb,
+  .history-breadcrumb,
+  .page-breadcrumb {
+    max-width: none;
+    margin: 0;
+    padding: 18px 40px 12px;
+    background: #eef2f7;
+  }
+
+  .practice-settings-shell .practice-settings-page,
+  .practice-shell .practice-page,
+  .growth-record-shell .growth-record-page,
+  .analysis-shell .analysis-page,
+  .history-shell .history-page,
+  .page-shell .page {
+    max-width: none;
+    min-height: calc(100svh - 52px);
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  .dashboard-shell {
+    padding: 0;
+  }
+
+  .dashboard-shell .dashboard-page {
+    max-width: none;
+    min-height: 100svh;
+    padding: 0;
+    grid-template-columns: 230px minmax(0, 1fr);
+    border-radius: 0;
+    box-shadow: none;
+  }
+
+  @media (max-width: 800px) {
+    .practice-settings-shell,
+    .practice-shell,
+    .growth-record-shell,
+    .analysis-shell,
+    .history-shell,
+    .page-shell {
+      padding: 0;
+    }
+
+    .practice-settings-shell .practice-settings-page,
+    .practice-shell .practice-page,
+    .growth-record-shell .growth-record-page,
+    .analysis-shell .analysis-page,
+    .history-shell .history-page,
+    .page-shell .page {
+      width: 100%;
+      min-height: 100svh;
+      border-radius: 0;
+      box-shadow: none;
+    }
+  }
+}
