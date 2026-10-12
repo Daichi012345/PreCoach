@@ -3,66 +3,131 @@ import './DashboardPage.css'
 function DashboardPage() {
   return (
     <main className="dashboard-shell">
-      <p className="dashboard-breadcrumb">PreCoach / 02 ホーム</p>
-
       <div className="dashboard-page">
-        <header className="dashboard-header">
-          <p className="dashboard-brand">PreCoach</p>
-          <nav className="dashboard-nav" aria-label="メインメニュー">
-            <a href="/dashboard">Dashboard</a>
-            <span aria-hidden="true">/</span>
-            <a href="/growth-record">練習履歴</a>
-            <span aria-hidden="true">/</span>
-            <a href="#settings">設定</a>
-            <span aria-hidden="true">/</span>
-            <a href="/login">Login</a>
-          </nav>
-        </header>
-
-        <section className="dashboard-content" id="home" aria-labelledby="dashboard-title">
-          <h1 id="dashboard-title">ホーム</h1>
-
-          <section className="welcome-card" aria-labelledby="welcome-title">
-            <h2 id="welcome-title">次の発表に向けて練習しましょう</h2>
-            <p>目標時間を設定して、カメラとマイクで発表を記録します。</p>
-          </section>
-
-          <a className="practice-button" href="/practice-settings">
-            新しい練習を始める
+        <aside className="dashboard-sidebar">
+          <a className="dashboard-sidebar-brand" href="/dashboard">
+            PreCoach
           </a>
-          <section className="stats-card" aria-label="練習サマリー">
+          <nav className="dashboard-sidebar-nav" aria-label="メインメニュー">
+            <a className="is-active" href="/dashboard">
+              <span aria-hidden="true">⌂</span> ホーム
+            </a>
+            <a href="/practice-settings">
+              <span aria-hidden="true">＋</span> 練習を始める
+            </a>
+            <a href="/practice-history">
+              <span aria-hidden="true">▣</span> 練習履歴
+            </a>
+            <a href="/analysis-result">
+              <span aria-hidden="true">⌁</span> 分析結果
+            </a>
+            <a href="/growth-record">
+              <span aria-hidden="true">✦</span> 成長記録
+            </a>
+            <a href="/practice-settings">
+              <span aria-hidden="true">⚙</span> 設定
+            </a>
+          </nav>
+          <a className="dashboard-sidebar-login" href="/login">
+            ログアウト
+          </a>
+        </aside>
+
+        <section className="dashboard-main" id="home" aria-labelledby="dashboard-title">
+          <header className="dashboard-header">
             <div>
-              <strong>練習回数 8回</strong>
-              <span aria-hidden="true">/</span>
-              <strong>最新スコア 78点</strong>
-              <span aria-hidden="true">/</span>
-              <strong>前回比 +6点</strong>
+              <p className="dashboard-eyebrow">PreCoach / 02 ホーム</p>
+              <h1 id="dashboard-title">おかえりなさい！</h1>
             </div>
-          </section>
+            <a className="dashboard-new-button" href="/practice-settings">
+              新しい練習
+            </a>
+          </header>
 
-          <section className="presentation-card" aria-labelledby="presentation-title">
-            <div className="presentation-main">
-              <h2 id="presentation-title">卒業制作 中間発表</h2>
-              <strong>10/08</strong>
-              <strong>5分</strong>
+          <section className="dashboard-stats" aria-label="練習サマリー">
+            <article className="dashboard-stat-card">
+              <span>練習回数</span>
+              <strong>8回</strong>
+              <small>今月の合計</small>
+            </article>
+            <article className="dashboard-stat-card">
+              <span>最新スコア</span>
               <strong>78点</strong>
-            </div>
-            <div className="presentation-detail">
-              <span>ゼミ発表</span>
-              <span>10/06</span>
-              <span>3分</span>
-              <span>72点</span>
-            </div>
+              <small className="positive">前回比 +6点</small>
+            </article>
+            <article className="dashboard-stat-card">
+              <span>平均スコア</span>
+              <strong>73点</strong>
+              <small>直近1か月</small>
+            </article>
+            <article className="dashboard-stat-card">
+              <span>改善達成率</span>
+              <strong>67%</strong>
+              <small>2 / 3項目達成</small>
+            </article>
           </section>
-        </section>
 
-        <footer className="dashboard-footer">
-          <span>WIREFRAME v0.1</span>
-          <span aria-hidden="true">|</span>
-          <span>表示データはサンプル</span>
-          <span aria-hidden="true">|</span>
-          <span>PC 1200px</span>
-        </footer>
+          <div className="dashboard-panels">
+            <section className="dashboard-panel overview-panel" aria-labelledby="overview-title">
+              <div className="dashboard-panel-heading">
+                <h2 id="overview-title">総合スコアの推移</h2>
+                <span>直近1か月</span>
+              </div>
+              <div className="dashboard-chart" aria-label="総合スコアの推移グラフ">
+                <div className="dashboard-gridline gridline-one" />
+                <div className="dashboard-gridline gridline-two" />
+                <div className="dashboard-gridline gridline-three" />
+                <div className="dashboard-gridline gridline-four" />
+                <div className="dashboard-chart-area" />
+                <div className="dashboard-chart-line">
+                  <i className="chart-point point-one" />
+                  <i className="chart-point point-two" />
+                  <i className="chart-point point-three" />
+                  <i className="chart-point point-four" />
+                </div>
+              </div>
+              <div className="dashboard-chart-labels">
+                <span>10/03</span>
+                <span>10/06</span>
+                <span>10/08</span>
+                <strong>78点</strong>
+              </div>
+            </section>
+
+            <section className="dashboard-panel activity-panel" aria-labelledby="activity-title">
+              <div className="dashboard-panel-heading">
+                <h2 id="activity-title">最近の練習履歴</h2>
+                <a href="/practice-history">すべて見る</a>
+              </div>
+              <div className="dashboard-activity-list">
+                <a href="/analysis-result">
+                  <span className="activity-icon">78</span>
+                  <span>
+                    <strong>卒業制作 中間発表</strong>
+                    <small>10/08 ・ 5分</small>
+                  </span>
+                  <b>78点</b>
+                </a>
+                <a href="/analysis-result">
+                  <span className="activity-icon">72</span>
+                  <span>
+                    <strong>ゼミ発表</strong>
+                    <small>10/06 ・ 3分</small>
+                  </span>
+                  <b>72点</b>
+                </a>
+                <a href="/analysis-result">
+                  <span className="activity-icon">68</span>
+                  <span>
+                    <strong>初回練習</strong>
+                    <small>10/03 ・ 4分55秒</small>
+                  </span>
+                  <b>68点</b>
+                </a>
+              </div>
+            </section>
+          </div>
+        </section>
       </div>
     </main>
   )

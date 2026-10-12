@@ -8,8 +8,10 @@ function LoginPage() {
   }
 
   return (
-    <main className="page">
-      <header className="brand">
+    <main className="page-shell">
+      <p className="page-breadcrumb">PreCoach / 01 ログイン</p>
+      <div className="page">
+        <header className="brand">
         <a className="brand-name" href="/dashboard">
           PreCoach
         </a>
@@ -19,7 +21,7 @@ function LoginPage() {
           <span aria-hidden="true">/</span>
           <a href="/register">新規登録</a>
         </nav>
-      </header>
+        </header>
 
       <h1 className="page-title">ログイン</h1>
 
@@ -76,13 +78,14 @@ function LoginPage() {
         </form>
       </section>
 
-      <footer className="page-footer">
+        <footer className="page-footer">
         <span>WIREFRAME v0.1</span>
         <span aria-hidden="true">|</span>
         <span>表示データはサンプル</span>
         <span aria-hidden="true">|</span>
         <span>PC 1200px</span>
-      </footer>
+        </footer>
+      </div>
     </main>
     
   )

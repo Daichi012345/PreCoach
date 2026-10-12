@@ -11,15 +11,15 @@ function GrowthRecordPage() {
             PreCoach
           </a>
           <nav className="growth-record-nav" aria-label="ページ">
-            <a href="/dashboard">ホーム</a>
+            <a href="/dashboard">Dashboard</a>
             <span aria-hidden="true">/</span>
             <a href="/practice-settings">練習を始める</a>
             <span aria-hidden="true">/</span>
-            <a href="/growth-record">練習履歴</a>
+            <a href="/practice-history">練習履歴</a>
             <span aria-hidden="true">/</span>
             <a href="/growth-record">成長記録</a>
             <span aria-hidden="true">/</span>
-            <a href="/dashboard#settings">設定</a>
+            <a href="/practice-settings">設定</a>
           </nav>
         </header>
 

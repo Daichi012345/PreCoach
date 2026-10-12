@@ -1,22 +1,22 @@
-import { useState } from 'react'
 import './AnalysisResultPage.css'
 
 function AnalysisResultPage() {
-  const [message, setMessage] = useState('')
-
   return (
     <main className="analysis-shell">
+      <p className="analysis-breadcrumb">PreCoach / 06 分析結果</p>
       <div className="analysis-page">
         <header className="analysis-header">
-          <p className="analysis-brand">PreCoach</p>
+          <a className="analysis-brand" href="/dashboard">
+            PreCoach
+          </a>
           <nav className="analysis-nav" aria-label="メインメニュー">
-            <span>ホーム</span>
+            <a href="/dashboard">ホーム</a>
             <span aria-hidden="true">/</span>
-            <span>練習を始める</span>
+            <a href="/practice-settings">練習を始める</a>
             <span aria-hidden="true">/</span>
-            <span>練習履歴</span>
+            <a href="/practice-history">練習履歴</a>
             <span aria-hidden="true">/</span>
-            <span>設定</span>
+            <a href="/practice-settings">設定</a>
           </nav>
         </header>
 
@@ -59,18 +59,12 @@ function AnalysisResultPage() {
             <p>03:20&nbsp; 話す速度が上がる → 録画を確認</p>
           </section>
 
-          <button
+          <a
             className="analysis-repeat-button"
-            type="button"
-            onClick={() => setMessage('練習機能は現在準備中です。')}
+            href="/practice-settings"
           >
             もう一度練習する
-          </button>
-          {message && (
-            <p className="analysis-message" role="status">
-              {message}
-            </p>
-          )}
+          </a>
         </section>
 
         <footer className="analysis-footer">

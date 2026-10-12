@@ -20,8 +20,10 @@ function RegisterPage() {
   }
 
   return (
-    <main className="page">
-      <header className="brand">
+    <main className="page-shell">
+      <p className="page-breadcrumb">PreCoach / 01 新規登録</p>
+      <div className="page">
+        <header className="brand">
         <a className="brand-name" href="/dashboard">
           PreCoach
         </a>
@@ -31,7 +33,7 @@ function RegisterPage() {
           <span aria-hidden="true">/</span>
           <a href="/login">Login</a>
         </nav>
-      </header>
+        </header>
 
       <h1 className="page-title">新規登録</h1>
 
@@ -103,13 +105,14 @@ function RegisterPage() {
         </form>
       </section>
 
-      <footer className="page-footer">
+        <footer className="page-footer">
         <span>WIREFRAME v0.1</span>
         <span aria-hidden="true">|</span>
         <span>表示データはサンプル</span>
         <span aria-hidden="true">|</span>
         <span>PC 1200px</span>
-      </footer>
+        </footer>
+      </div>
     </main>
   )
 }
