@@ -1,0 +1,225 @@
+.growth-record-shell {
+  box-sizing: border-box;
+  min-height: 100svh;
+  padding: 24px max(24px, calc((100% - 1200px) / 2));
+  color: #172033;
+  background: #e9edf2;
+}
+
+.growth-record-breadcrumb {
+  max-width: 1200px;
+  margin: 0 0 10px;
+  color: #8a919b;
+  font-size: 14px;
+  line-height: 1.4;
+}
+
+.growth-record-page {
+  box-sizing: border-box;
+  max-width: 1200px;
+  min-height: calc(100svh - 64px);
+  margin: 0 auto;
+  padding: 22px 38px;
+  background: #f7f9fc;
+}
+
+.growth-record-header {
+  margin-bottom: 17px;
+}
+
+.growth-record-brand {
+  color: #172033;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.25;
+  text-decoration: none;
+}
+
+.growth-record-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-top: 3px;
+  color: #8290a5;
+  font-size: 9px;
+  line-height: 1.3;
+}
+
+.growth-record-nav a {
+  color: inherit;
+  text-decoration: none;
+}
+
+.growth-record-nav a:hover {
+  color: #263247;
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.growth-record-content h1 {
+  margin: 0 0 15px;
+  font-size: 22px;
+  line-height: 1.25;
+}
+
+.growth-card {
+  border: 1px solid #e1e7ee;
+  border-radius: 10px;
+  background: #fff;
+  box-shadow: 0 2px 7px rgb(31 48 73 / 3%);
+  padding: 11px 14px 10px;
+}
+
+.growth-card + .growth-card {
+  margin-top: 11px;
+}
+
+.growth-card h2,
+.growth-card strong {
+  margin: 0;
+  font-size: 12px;
+  line-height: 1.4;
+}
+
+.growth-card p,
+.detail-values,
+.chart-legend,
+.score-dates {
+  color: #66758a;
+  font-size: 9px;
+  line-height: 1.4;
+}
+
+.growth-card p {
+  margin: 3px 0 0;
+}
+
+.growth-card-heading {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px;
+}
+
+.summary-card {
+  padding-top: 11px;
+}
+
+.summary-card > div {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.score-card {
+  padding-bottom: 10px;
+}
+
+.score-chart {
+  position: relative;
+  height: 121px;
+  margin-top: 8px;
+  overflow: hidden;
+  border: 1px solid #e1e7ee;
+  border-radius: 8px;
+}
+
+.chart-line {
+  position: absolute;
+  right: 20px;
+  left: 40px;
+  height: 1px;
+  background: #dfe4ea;
+}
+
+.chart-line-one { top: 18px; }
+.chart-line-two { top: 45px; }
+.chart-line-three { top: 72px; }
+.chart-line-four { top: 99px; }
+
+.chart-axis {
+  position: absolute;
+  right: 20px;
+  bottom: 9px;
+  left: 40px;
+  height: 1px;
+  background: #dfe4ea;
+}
+
+.score-trend {
+  position: absolute;
+  top: 62px;
+  right: 18%;
+  left: 17%;
+  height: 1px;
+  background: #2d6be8;
+  transform: rotate(-6deg);
+}
+
+.score-point {
+  position: absolute;
+  top: -3px;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: #2d6be8;
+}
+
+.score-point-one { left: 0; }
+.score-point-two { left: 50%; }
+.score-point-three { right: 0; }
+
+.chart-legend {
+  margin: 7px 0 0;
+  font-size: 8px;
+}
+
+.score-dates {
+  display: flex;
+  gap: 35px;
+  margin-top: 2px;
+  font-size: 8px;
+}
+
+.detail-values {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px 18px;
+  margin-top: 5px;
+}
+
+.history-card p + p {
+  margin-top: 4px;
+}
+
+.next-goal-card {
+  padding-top: 10px;
+}
+
+.next-goal-card p {
+  font-size: 8px;
+}
+
+.growth-record-nav a:focus-visible {
+  outline: 3px solid #8da2c2;
+  outline-offset: 3px;
+}
+
+@media (max-width: 600px) {
+  .growth-record-shell {
+    padding: 16px;
+  }
+
+  .growth-record-page {
+    min-height: calc(100svh - 46px);
+    padding: 20px;
+  }
+
+  .detail-values {
+    grid-template-columns: 1fr;
+  }
+
+  .score-dates {
+    flex-wrap: wrap;
+    gap: 4px 18px;
+  }
+}

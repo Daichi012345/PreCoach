@@ -1,9 +1,6 @@
-import { useState } from 'react'
 import './DashboardPage.css'
 
 function DashboardPage() {
-  const [message, setMessage] = useState('')
-
   return (
     <main className="dashboard-shell">
       <p className="dashboard-breadcrumb">PreCoach / 02 ホーム</p>
@@ -12,13 +9,13 @@ function DashboardPage() {
         <header className="dashboard-header">
           <p className="dashboard-brand">PreCoach</p>
           <nav className="dashboard-nav" aria-label="メインメニュー">
-            <a href="#home">ホーム</a>
+            <a href="/dashboard">Dashboard</a>
             <span aria-hidden="true">/</span>
-            <a href="#practice">練習を始める</a>
-            <span aria-hidden="true">/</span>
-            <a href="#history">練習履歴</a>
+            <a href="/growth-record">練習履歴</a>
             <span aria-hidden="true">/</span>
             <a href="#settings">設定</a>
+            <span aria-hidden="true">/</span>
+            <a href="/login">Login</a>
           </nav>
         </header>
 
@@ -30,19 +27,9 @@ function DashboardPage() {
             <p>目標時間を設定して、カメラとマイクで発表を記録します。</p>
           </section>
 
-          <button
-            className="practice-button"
-            type="button"
-            onClick={() => setMessage('練習の準備を始めます。')}
-          >
+          <a className="practice-button" href="/practice-settings">
             新しい練習を始める
-          </button>
-          {message && (
-            <p className="dashboard-message" role="status">
-              {message}
-            </p>
-          )}
-
+          </a>
           <section className="stats-card" aria-label="練習サマリー">
             <div>
               <strong>練習回数 8回</strong>

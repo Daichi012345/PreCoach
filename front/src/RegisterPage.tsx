@@ -22,8 +22,15 @@ function RegisterPage() {
   return (
     <main className="page">
       <header className="brand">
-        <p className="brand-name">PreCoach</p>
+        <a className="brand-name" href="/dashboard">
+          PreCoach
+        </a>
         <p className="brand-tagline">AIと練習して、伝わるプレゼンへ。</p>
+        <nav className="page-navigation" aria-label="ページ">
+          <a href="/dashboard">Dashboard</a>
+          <span aria-hidden="true">/</span>
+          <a href="/login">Login</a>
+        </nav>
       </header>
 
       <h1 className="page-title">新規登録</h1>

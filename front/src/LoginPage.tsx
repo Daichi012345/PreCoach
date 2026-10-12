@@ -1,19 +1,24 @@
-import { useState, type FormEvent } from 'react'
+import type { FormEvent } from 'react'
 import './AuthPage.css'
 
 function LoginPage() {
-  const [message, setMessage] = useState('')
-
   function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    setMessage('ログイン機能は現在準備中です。')
+    window.location.assign('/dashboard')
   }
 
   return (
     <main className="page">
       <header className="brand">
-        <p className="brand-name">PreCoach</p>
+        <a className="brand-name" href="/dashboard">
+          PreCoach
+        </a>
         <p className="brand-tagline">AIと練習して、伝わるプレゼンへ。</p>
+        <nav className="page-navigation" aria-label="ページ">
+          <a href="/dashboard">Dashboard</a>
+          <span aria-hidden="true">/</span>
+          <a href="/register">新規登録</a>
+        </nav>
       </header>
 
       <h1 className="page-title">ログイン</h1>
@@ -48,23 +53,20 @@ function LoginPage() {
           </div>
 
           <div className="form-actions">
-            <button className="action-button" type="submit">
+            <button
+              className="action-button"
+              type="submit"
+            >
               ログイン
             </button>
             <button
               className="action-button"
               type="button"
-              onClick={() => setMessage('Googleログイン機能は現在準備中です。')}
+              onClick={() => window.location.assign('/dashboard')}
             >
               Googleでログイン
             </button>
           </div>
-
-          {message && (
-            <p className="form-message" role="status">
-              {message}
-            </p>
-          )}
 
           <nav className="account-links" aria-label="アカウント">
             <a href="/register">新規登録</a>
@@ -82,6 +84,7 @@ function LoginPage() {
         <span>PC 1200px</span>
       </footer>
     </main>
+    
   )
 }
 

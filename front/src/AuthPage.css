@@ -10,12 +10,37 @@
 }
 
 .brand-name {
+  display: inline-block;
   margin: 0;
   color: #172033;
   font-size: 24px;
   font-weight: 700;
   letter-spacing: -0.04em;
   line-height: 1.25;
+  text-decoration: none;
+}
+
+.brand-name:hover {
+  color: #526783;
+}
+
+.page-navigation {
+  display: flex;
+  gap: 7px;
+  margin-top: 10px;
+  color: #a0adbf;
+  font-size: 12px;
+}
+
+.page-navigation a {
+  color: #78879c;
+  text-decoration: none;
+}
+
+.page-navigation a:hover {
+  color: #263247;
+  text-decoration: underline;
+  text-underline-offset: 3px;
 }
 
 .brand-tagline {
@@ -116,7 +141,9 @@
 }
 
 .action-button:focus-visible,
-.account-links a:focus-visible {
+.account-links a:focus-visible,
+.brand-name:focus-visible,
+.page-navigation a:focus-visible {
   outline: 3px solid #8da2c2;
   outline-offset: 3px;
 }
