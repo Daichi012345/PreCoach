@@ -1,5 +1,5 @@
 import { useState, type FormEvent } from 'react'
-import './LoginPage.css'
+import './AuthPage.css'
 
 function LoginPage() {
   const [message, setMessage] = useState('')
@@ -18,11 +18,11 @@ function LoginPage() {
 
       <h1 className="page-title">ログイン</h1>
 
-      <section className="login-card" aria-labelledby="login-heading">
+      <section className="auth-card" aria-labelledby="login-heading">
         <h2 id="login-heading" className="visually-hidden">
           アカウントにログイン
         </h2>
-        <form className="login-form" onSubmit={handleSubmit}>
+        <form className="auth-form" onSubmit={handleSubmit}>
           <div className="field">
             <label htmlFor="email">メールアドレス</label>
             <input
