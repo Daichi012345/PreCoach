@@ -24,8 +24,11 @@ function DashboardPage() {
             <a href="/growth-record">
               <span aria-hidden="true">✦</span> 成長記録
             </a>
-            <a href="/practice-settings">
-              <span aria-hidden="true">⚙</span> 設定
+            <a href="/upgrade">
+              <span aria-hidden="true">↑</span> アップグレード
+            </a>
+            <a href="/mypage">
+              <span aria-hidden="true">●</span> マイページ
             </a>
           </nav>
           <a className="dashboard-sidebar-login" href="/login">
