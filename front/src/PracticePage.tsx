@@ -86,6 +86,15 @@ function PracticePage() {
           >
             {isRecording ? '録画を終了' : '録画終了済み'}
           </button>
+          {!isRecording && (
+            <button
+              className="score-recording-button"
+              type="button"
+              onClick={() => window.location.assign('/analysis-loading')}
+            >
+              AIに採点してもらう
+            </button>
+          )}
         </section>
 
         <footer className="practice-footer">
