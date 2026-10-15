@@ -83,6 +83,40 @@
   font-size: 12px;
 }
 
+.presentation-fields {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 130px;
+  gap: 12px;
+  margin-top: 10px;
+}
+
+.presentation-fields label,
+.presentation-fields label > span {
+  color: #66758a;
+  font-size: 9px;
+}
+
+.presentation-fields input,
+.presentation-fields select {
+  box-sizing: border-box;
+  width: 100%;
+  min-height: 34px;
+  padding: 6px 9px;
+  border: 1px solid #dfe6ef;
+  border-radius: 7px;
+  background: #fff;
+  color: #263247;
+  font: inherit;
+  font-size: 11px;
+}
+
+.presentation-fields input:focus-visible,
+.presentation-fields select:focus-visible {
+  border-color: #2563eb;
+  outline: 3px solid rgb(147 197 253 / 45%);
+  outline-offset: 1px;
+}
+
 .settings-card dl {
   display: flex;
   gap: 24px;
@@ -120,6 +154,52 @@
   gap: 23px;
   margin-top: 5px;
   color: #66758a;
+  font-size: 9px;
+}
+
+.device-preview {
+  display: flex;
+  align-items: flex-end;
+  gap: 14px;
+  margin-top: 10px;
+}
+
+.device-preview video {
+  display: block;
+  width: 180px;
+  height: 100px;
+  border-radius: 7px;
+  background: #172033;
+  object-fit: cover;
+}
+
+.microphone-meter {
+  display: flex;
+  width: 180px;
+  flex-direction: column;
+  gap: 6px;
+  color: #66758a;
+  font-size: 9px;
+}
+
+.microphone-meter-track {
+  height: 8px;
+  overflow: hidden;
+  border-radius: 999px;
+  background: #e2e8f0;
+}
+
+.microphone-meter-track span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: #2563eb;
+  transition: width 100ms ease;
+}
+
+.device-error {
+  margin: 7px 0 0;
+  color: #dc2626;
   font-size: 9px;
 }
 
@@ -211,11 +291,25 @@
     flex-direction: column;
   }
 
+  .presentation-fields {
+    grid-template-columns: 1fr;
+  }
+
   .settings-card dl {
     gap: 3px;
   }
 
   .settings-options {
     gap: 10px;
+  }
+
+  .device-preview {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .device-preview video,
+  .microphone-meter {
+    width: 100%;
   }
 }

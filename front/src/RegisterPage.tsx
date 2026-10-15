@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from 'react'
 import './AuthPage.css'
+import { saveProfile } from './profile'
 
 function RegisterPage() {
   const [message, setMessage] = useState('')
@@ -16,6 +17,11 @@ function RegisterPage() {
       return
     }
 
+    saveProfile({
+      name: String(formData.get('name')),
+      organization: String(formData.get('organization')),
+      email: String(formData.get('email')),
+    })
     setMessage('新規登録機能は現在準備中です。')
   }
 
@@ -42,6 +48,30 @@ function RegisterPage() {
           アカウントを作成
         </h2>
         <form className="auth-form" onSubmit={handleSubmit}>
+          <div className="field">
+            <label htmlFor="name">お名前</label>
+            <input
+              id="name"
+              name="name"
+              type="text"
+              placeholder="山田 太郎"
+              autoComplete="name"
+              required
+            />
+          </div>
+
+          <div className="field">
+            <label htmlFor="organization">所属</label>
+            <input
+              id="organization"
+              name="organization"
+              type="text"
+              placeholder="サンプル大学"
+              autoComplete="organization"
+              required
+            />
+          </div>
+
           <div className="field">
             <label htmlFor="email">メールアドレス</label>
             <input
@@ -83,13 +113,6 @@ function RegisterPage() {
           <div className="form-actions">
             <button className="action-button" type="submit">
               アカウントを作成
-            </button>
-            <button
-              className="action-button"
-              type="button"
-              onClick={() => setMessage('Googleでの新規登録機能は現在準備中です。')}
-            >
-              Googleで登録
             </button>
           </div>
 

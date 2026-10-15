@@ -119,9 +119,22 @@
 }
 
 .camera-card {
-  min-height: 65px;
+  min-height: 0;
   margin-top: 11px;
   padding: 11px 14px 10px;
+}
+
+.practice-camera-preview {
+  display: block;
+  width: 100%;
+  max-width: none;
+  height: min(72svh, 720px);
+  min-height: 480px;
+  margin-top: 8px;
+  border-radius: 8px;
+  background: #172033;
+  object-fit: cover;
+  object-position: center;
 }
 
 .camera-card h2,
@@ -224,5 +237,10 @@
     flex-direction: column;
     gap: 8px;
     padding: 9px 12px;
+  }
+
+  .practice-camera-preview {
+    height: min(68svh, 560px);
+    min-height: 360px;
   }
 }

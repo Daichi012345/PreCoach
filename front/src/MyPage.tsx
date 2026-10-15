@@ -1,8 +1,26 @@
-import { useState } from 'react'
+import { useState, type FormEvent } from 'react'
 import './MyPage.css'
+import { getProfile, saveProfile, type Profile } from './profile'
 
 function MyPage() {
   const [message, setMessage] = useState('')
+  const [profile, setProfile] = useState<Profile>(getProfile)
+  const [isEditingProfile, setIsEditingProfile] = useState(false)
+  const [profileDraft, setProfileDraft] = useState(profile)
+
+  function startEditingProfile() {
+    setProfileDraft(profile)
+    setIsEditingProfile(true)
+    setMessage('')
+  }
+
+  function handleProfileSubmit(event: FormEvent<HTMLFormElement>) {
+    event.preventDefault()
+    saveProfile(profileDraft)
+    setProfile(profileDraft)
+    setIsEditingProfile(false)
+    setMessage('プロフィールを保存しました。')
+  }
 
   return (
     <main className="my-page-shell">
@@ -29,32 +47,65 @@ function MyPage() {
                   <p>登録されているアカウント情報</p>
                 </div>
                 <div className="profile-avatar" aria-hidden="true">
-                  山
+                  {profile.name.slice(0, 1)}
                 </div>
               </div>
 
-              <dl className="profile-details">
-                <div>
-                  <dt>お名前</dt>
-                  <dd>山田 太郎</dd>
-                </div>
-                <div>
-                  <dt>メールアドレス</dt>
-                  <dd>taro.yamada@example.com</dd>
-                </div>
-                <div>
-                  <dt>所属</dt>
-                  <dd>サンプル大学</dd>
-                </div>
-              </dl>
+              {isEditingProfile ? (
+                <form className="profile-edit-form" onSubmit={handleProfileSubmit}>
+                  <div className="profile-edit-field">
+                    <label htmlFor="profile-name">お名前</label>
+                    <input
+                      id="profile-name"
+                      value={profileDraft.name}
+                      onChange={(event) =>
+                        setProfileDraft({ ...profileDraft, name: event.target.value })
+                      }
+                      required
+                    />
+                  </div>
+                  <div className="profile-edit-field">
+                    <label htmlFor="profile-organization">所属</label>
+                    <input
+                      id="profile-organization"
+                      value={profileDraft.organization}
+                      onChange={(event) =>
+                        setProfileDraft({ ...profileDraft, organization: event.target.value })
+                      }
+                      required
+                    />
+                  </div>
+                  <div className="profile-edit-actions">
+                    <button className="my-page-secondary-button" type="button" onClick={() => setIsEditingProfile(false)}>
+                      キャンセル
+                    </button>
+                    <button className="my-page-primary-button" type="submit">
+                      保存する
+                    </button>
+                  </div>
+                </form>
+              ) : (
+                <>
+                  <dl className="profile-details">
+                    <div>
+                      <dt>お名前</dt>
+                      <dd>{profile.name}</dd>
+                    </div>
+                    <div>
+                      <dt>メールアドレス</dt>
+                      <dd>{profile.email}</dd>
+                    </div>
+                    <div>
+                      <dt>所属</dt>
+                      <dd>{profile.organization}</dd>
+                    </div>
+                  </dl>
 
-              <button
-                className="my-page-secondary-button"
-                type="button"
-                onClick={() => setMessage('プロフィールの編集機能は現在準備中です。')}
-              >
-                プロフィールを編集
-              </button>
+                  <button className="my-page-secondary-button" type="button" onClick={startEditingProfile}>
+                    プロフィールを編集
+                  </button>
+                </>
+              )}
             </section>
 
             <section className="my-page-card plan-card" aria-labelledby="plan-title">

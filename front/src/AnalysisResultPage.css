@@ -127,30 +127,49 @@
   padding: 9px 12px 8px;
 }
 
+
 .analysis-repeat-button {
-  display: inline-block;
-  margin-top: 12px;
-  padding: 6px 8px;
-  border: 1px solid #2d2d2d;
-  border-radius: 4px;
-  background: #303030;
-  color: #fff;
-  cursor: pointer;
-  font: inherit;
-  font-size: 9px;
-  line-height: 1.25;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+
+  width: fit-content;
+  min-width: 180px;
+  height: 48px;
+  padding: 0 24px;
+  margin-top: 16px;
+
+  border: none;
+  border-radius: 10px;
+
+  background-color: #2563eb;
+  color: #ffffff;
+
+  font-size: 15px;
+  font-weight: 600;
+  line-height: 1;
   text-decoration: none;
+  white-space: nowrap;
+
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(37, 99, 235, 0.15);
+  transition: background-color 0.2s ease, transform 0.2s ease;
 }
 
 .analysis-repeat-button:hover {
-  border-color: #111;
-  background: #181818;
+  background-color: #1d4ed8;
+  transform: translateY(-2px);
+}
+
+.analysis-repeat-button:active {
+  transform: translateY(0);
 }
 
 .analysis-repeat-button:focus-visible {
-  outline: 3px solid #8da2c2;
+  outline: 3px solid #93c5fd;
   outline-offset: 3px;
 }
+
 
 .analysis-message {
   display: inline;
