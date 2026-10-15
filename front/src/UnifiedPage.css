@@ -157,7 +157,6 @@
 .practice-button,
 .start-practice-button,
 .stop-recording-button,
-.analysis-repeat-button,
 .history-button {
   min-height: 44px;
   padding: 12px 22px;
@@ -174,7 +173,6 @@
 .practice-button:hover,
 .start-practice-button:hover,
 .stop-recording-button:hover:not(:disabled),
-.analysis-repeat-button:hover,
 .history-button:hover {
   border-color: #1d4ed8;
   background: #1d4ed8;
@@ -351,7 +349,7 @@
 
   .practice-button,
   .start-practice-button,
-  .analysis-repeat-button {
+  .history-button {
     width: 100%;
   }
 }

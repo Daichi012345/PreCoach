@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import './PracticePage.css'
 
 const TARGET_SECONDS = 5 * 60
@@ -12,6 +12,35 @@ function formatTime(seconds: number) {
 function PracticePage() {
   const [elapsedSeconds, setElapsedSeconds] = useState(0)
   const [isRecording, setIsRecording] = useState(true)
+  const [cameraStatus, setCameraStatus] = useState<'checking' | 'connected' | 'denied'>('checking')
+  const videoRef = useRef<HTMLVideoElement>(null)
+
+  useEffect(() => {
+    let stream: MediaStream | undefined
+
+    async function connectCamera() {
+      if (!navigator.mediaDevices?.getUserMedia) {
+        setCameraStatus('denied')
+        return
+      }
+
+      try {
+        stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+        if (videoRef.current) {
+          videoRef.current.srcObject = stream
+        }
+        setCameraStatus('connected')
+      } catch {
+        setCameraStatus('denied')
+      }
+    }
+
+    void connectCamera()
+
+    return () => {
+      stream?.getTracks().forEach((track) => track.stop())
+    }
+  }, [])
 
   useEffect(() => {
     if (!isRecording) {
@@ -68,12 +97,21 @@ function PracticePage() {
 
           <section className="camera-card" aria-labelledby="camera-title">
             <h2 id="camera-title">カメラ映像エリア</h2>
-            <p>発表者の映像を表示します。</p>
-          </section>
-
-          <section className="measurement-card" aria-labelledby="measurement-title">
-            <h2 id="measurement-title">目線・姿勢・音声を計測中</h2>
-            <p>リアルタイム分析の表示は設定で切り替え</p>
+            <video
+              ref={videoRef}
+              className="practice-camera-preview"
+              autoPlay
+              muted
+              playsInline
+              aria-label="発表者のカメラ映像"
+            />
+            <p>
+              {cameraStatus === 'connected'
+                ? 'カメラ映像を表示中です。'
+                : cameraStatus === 'checking'
+                  ? 'カメラを確認しています。'
+                  : 'カメラを使用できません。ブラウザの権限を確認してください。'}
+            </p>
           </section>
 
           <p className="practice-note">録画終了後に結果を確認できます。</p>

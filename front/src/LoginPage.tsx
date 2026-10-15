@@ -61,13 +61,6 @@ function LoginPage() {
             >
               ログイン
             </button>
-            <button
-              className="action-button"
-              type="button"
-              onClick={() => window.location.assign('/dashboard')}
-            >
-              Googleでログイン
-            </button>
           </div>
 
           <nav className="account-links" aria-label="アカウント">
