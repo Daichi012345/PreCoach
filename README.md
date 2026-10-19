@@ -11,6 +11,10 @@ Docker Desktopを起動した状態で、プロジェクトのルートディレ
 ```dotenv
 POSTGRES_PASSWORD=admin
 PRECOACH_USER_PASSWORD=admin
+VITE_HOST=10.200.5.86
+VITE_PORT=5173
+VITE_API_BASE_URL=http://10.200.5.86:8000
+CORS_ORIGINS=http://localhost:5173
 ```
 
 PostgreSQLだけを起動する場合:
@@ -20,6 +24,8 @@ docker compose up -d postgres
 ```
 
 初回起動時に `precoach` データベースと `precoach_user` を作成し、`docker/postgres/init/01-create-user-and-grants.sh` の権限設定を実行します。データは `postgres_data` ボリュームに保存されます。接続情報はホスト `localhost`、ポート `5432`、データベース `precoach`、ユーザー `precoach_user` です。
+
+バックエンド起動時に `users` と `practices` テーブルを自動作成します。新規登録・ログイン・練習履歴はPostgreSQLに保存され、フロントエンドはログイン時に取得したトークンでAPIへアクセスします。
 
 既存の `postgres_data` ボリュームを使っている場合、`.env` の変更だけではPostgreSQL内のパスワードは変わりません。コンテナ起動後に以下を実行して管理者パスワードを合わせてください。`precoach_user` のパスワードは既存ボリュームでは初期化時の値のままです。
 
@@ -64,6 +70,19 @@ PostgreSQLは `localhost:5432` のみで待ち受け、Docker内の他サービ�
 
 - フロントエンド: http://localhost:5173
 - バックエンドAPI: http://localhost:8000
+
+別端末からアクセスする場合は、`.env` の `CORS_ORIGINS` にフロントエンドのURLを指定してください（例: `CORS_ORIGINS=http://192.168.1.10:5173`）。
+
+`.env` の `CORS_ORIGIN_REGEX` はLAN内のIPアドレスを初期値で許可しています。起動後、`ipconfig` で確認したPCのIPv4アドレスを使って `http://<IPv4アドレス>:5173` を開いてください。フロントエンドは開いたホストのIPアドレスを自動的にAPI接続先として使用します。
+
+`npm run dev` を使う場合は、フロントエンドディレクトリで実行します。`.env` の `VITE_HOST`、`VITE_PORT`、`VITE_API_BASE_URL` を変更すると、待受IP・ポート・API接続先を変更できます。例:
+
+```powershell
+cd front
+npm run dev
+```
+
+初回利用時はフロントエンドの「新規登録」からアカウントを作成してください。登録後にログインすると、練習履歴ページでアカウントごとのデータを確認できます。
 
 ### 同じネットワークの別端末からアクセスする
 

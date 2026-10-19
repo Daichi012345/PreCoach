@@ -1,10 +1,23 @@
 import type { FormEvent } from 'react'
 import './AuthPage.css'
+import { login, saveToken } from './api'
+import { saveProfile } from './profile'
 
 function LoginPage() {
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
-    window.location.assign('/dashboard')
+    const formData = new FormData(event.currentTarget)
+    try {
+      const result = await login({
+        email: String(formData.get('email')).trim(),
+        password: String(formData.get('password')),
+      })
+      saveToken(result.token)
+      saveProfile(result.user)
+      window.location.assign('/dashboard')
+    } catch (error) {
+      window.alert(error instanceof Error ? error.message : 'ログインに失敗しました')
+    }
   }
 
   return (

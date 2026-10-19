@@ -1,6 +1,38 @@
+import { useEffect, useState } from 'react'
 import './DashboardPage.css'
+import { clearToken, getCurrentUser, getPractices, type Practice, type User } from './api'
 
 function DashboardPage() {
+  const [user, setUser] = useState<User | null>(null)
+  const [practices, setPractices] = useState<Practice[]>([])
+
+  useEffect(() => {
+    Promise.all([getCurrentUser(), getPractices()])
+      .then(([currentUser, userPractices]) => {
+        setUser(currentUser)
+        setPractices(userPractices)
+      })
+      .catch(() => {
+        clearToken()
+        window.location.assign('/login')
+      })
+  }, [])
+
+  const latestPractices = practices.slice(0, 3)
+  const scoredPractices = practices.filter((practice) => practice.score !== null)
+  const averageScore =
+    scoredPractices.length === 0
+      ? null
+      : Math.round(
+          scoredPractices.reduce((total, practice) => total + (practice.score || 0), 0) /
+            scoredPractices.length,
+        )
+
+  function handleLogout() {
+    clearToken()
+    window.location.assign('/login')
+  }
+
   return (
     <main className="dashboard-shell">
       <div className="dashboard-page">
@@ -31,16 +63,16 @@ function DashboardPage() {
               <span aria-hidden="true">●</span> マイページ
             </a>
           </nav>
-          <a className="dashboard-sidebar-login" href="/login">
+          <button className="dashboard-sidebar-login" type="button" onClick={handleLogout}>
             ログアウト
-          </a>
+          </button>
         </aside>
 
         <section className="dashboard-main" id="home" aria-labelledby="dashboard-title">
           <header className="dashboard-header">
             <div>
               <p className="dashboard-eyebrow">PreCoach / 02 ホーム</p>
-              <h1 id="dashboard-title">おかえりなさい！</h1>
+              <h1 id="dashboard-title">{user ? `${user.name}さん、おかえりなさい！` : 'おかえりなさい！'}</h1>
             </div>
             <a className="dashboard-new-button" href="/practice-settings">
               新しい練習
@@ -50,17 +82,17 @@ function DashboardPage() {
           <section className="dashboard-stats" aria-label="練習サマリー">
             <article className="dashboard-stat-card">
               <span>練習回数</span>
-              <strong>8回</strong>
+              <strong>{practices.length}回</strong>
               <small>今月の合計</small>
             </article>
             <article className="dashboard-stat-card">
               <span>最新スコア</span>
-              <strong>78点</strong>
-              <small className="positive">前回比 +6点</small>
+              <strong>{practices[0]?.score === null || practices[0]?.score === undefined ? '-' : `${practices[0].score}点`}</strong>
+              <small className="positive">保存済みの最新スコア</small>
             </article>
             <article className="dashboard-stat-card">
               <span>平均スコア</span>
-              <strong>73点</strong>
+              <strong>{averageScore === null ? '-' : `${averageScore}点`}</strong>
               <small>直近1か月</small>
             </article>
             <article className="dashboard-stat-card">
@@ -103,30 +135,23 @@ function DashboardPage() {
                 <a href="/practice-history">すべて見る</a>
               </div>
               <div className="dashboard-activity-list">
-                <a href="/analysis-result">
-                  <span className="activity-icon">78</span>
-                  <span>
-                    <strong>卒業制作 中間発表</strong>
-                    <small>10/08 ・ 5分</small>
-                  </span>
-                  <b>78点</b>
-                </a>
-                <a href="/analysis-result">
-                  <span className="activity-icon">72</span>
-                  <span>
-                    <strong>ゼミ発表</strong>
-                    <small>10/06 ・ 3分</small>
-                  </span>
-                  <b>72点</b>
-                </a>
-                <a href="/analysis-result">
-                  <span className="activity-icon">68</span>
-                  <span>
-                    <strong>初回練習</strong>
-                    <small>10/03 ・ 4分55秒</small>
-                  </span>
-                  <b>68点</b>
-                </a>
+                {latestPractices.length === 0 ? (
+                  <p>まだ練習履歴がありません。</p>
+                ) : (
+                  latestPractices.map((practice) => (
+                    <a href="/analysis-result" key={practice.id}>
+                      <span className="activity-icon">{practice.score ?? '-'}</span>
+                      <span>
+                        <strong>{practice.title}</strong>
+                        <small>
+                          {new Date(practice.date).toLocaleDateString('ja-JP')} ・{' '}
+                          {Math.floor(practice.duration / 60)}分
+                        </small>
+                      </span>
+                      <b>{practice.score === null ? '-' : `${practice.score}点`}</b>
+                    </a>
+                  ))
+                )}
               </div>
             </section>
           </div>
