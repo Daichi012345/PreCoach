@@ -1,12 +1,22 @@
+import { useEffect, useState } from 'react'
 import './PracticeHistoryPage.css'
-
-const practiceHistory = [
-  { date: '10/08', title: '卒業制作 中間発表', duration: '5:02', score: 78 },
-  { date: '10/06', title: 'ゼミ発表', duration: '3:10', score: 72 },
-  { date: '10/03', title: '初回練習', duration: '4:55', score: 68 },
-]
+import { getPractices, type Practice } from './api'
 
 function PracticeHistoryPage() {
+  const [practiceHistory, setPracticeHistory] = useState<Practice[]>([])
+  const [message, setMessage] = useState('読み込み中...')
+
+  useEffect(() => {
+    getPractices()
+      .then((practices) => {
+        setPracticeHistory(practices)
+        setMessage(practices.length === 0 ? 'まだ練習履歴がありません。' : '')
+      })
+      .catch((error: unknown) => {
+        setMessage(error instanceof Error ? error.message : '履歴の取得に失敗しました')
+      })
+  }, [])
+
   return (
     <main className="history-shell">
       <p className="history-breadcrumb">PreCoach / 05 練習履歴</p>
@@ -30,8 +40,8 @@ function PracticeHistoryPage() {
           <h1 id="history-title">練習履歴</h1>
 
           <section className="history-card history-progress" aria-labelledby="progress-title">
-            <h2 id="progress-title">スコア推移（サンプル）</h2>
-            <p>第1回 68点 → 第2回 72点 → 第3回 78点</p>
+            <h2 id="progress-title">スコア推移</h2>
+            <p>{message || '保存された練習のスコアを表示しています。'}</p>
           </section>
 
           <section className="history-card history-table-card" aria-label="練習記録一覧">
@@ -46,11 +56,11 @@ function PracticeHistoryPage() {
               </thead>
               <tbody>
                 {practiceHistory.map((practice) => (
-                  <tr key={practice.date}>
-                    <td>{practice.date}</td>
+                  <tr key={practice.id}>
+                    <td>{new Date(practice.date).toLocaleDateString('ja-JP')}</td>
                     <td>{practice.title}</td>
-                    <td>{practice.duration}</td>
-                    <td>{practice.score}</td>
+                    <td>{Math.floor(practice.duration / 60)}分</td>
+                    <td>{practice.score === null ? '-' : practice.score}</td>
                   </tr>
                 ))}
               </tbody>

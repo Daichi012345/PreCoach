@@ -1,11 +1,11 @@
 import { useState, type FormEvent } from 'react'
 import './AuthPage.css'
-import { saveProfile } from './profile'
+import { register } from './api'
 
 function RegisterPage() {
   const [message, setMessage] = useState('')
 
-  function handleSubmit(event: FormEvent<HTMLFormElement>) {
+  async function handleSubmit(event: FormEvent<HTMLFormElement>) {
     event.preventDefault()
 
     const formData = new FormData(event.currentTarget)
@@ -17,12 +17,18 @@ function RegisterPage() {
       return
     }
 
-    saveProfile({
-      name: String(formData.get('name')),
-      organization: String(formData.get('organization')),
-      email: String(formData.get('email')),
-    })
-    setMessage('新規登録機能は現在準備中です。')
+    try {
+      await register({
+        name: String(formData.get('name')).trim(),
+        organization: String(formData.get('organization')).trim(),
+        email: String(formData.get('email')).trim(),
+        password: String(password),
+      })
+      setMessage('登録が完了しました。ログイン画面へ移動します。')
+      window.setTimeout(() => window.location.assign('/login'), 800)
+    } catch (error) {
+      setMessage(error instanceof Error ? error.message : '登録に失敗しました')
+    }
   }
 
   return (
@@ -90,9 +96,9 @@ function RegisterPage() {
               id="password"
               name="password"
               type="password"
-              placeholder="8文字以上"
+              placeholder="4文字以上"
               autoComplete="new-password"
-              minLength={8}
+              minLength={4}
               required
             />
           </div>
@@ -105,7 +111,7 @@ function RegisterPage() {
               type="password"
               placeholder="パスワードをもう一度入力"
               autoComplete="new-password"
-              minLength={8}
+              minLength={4}
               required
             />
           </div>
