@@ -2,15 +2,20 @@ import hashlib
 import hmac
 import os
 import secrets
+import tempfile
 from datetime import datetime, timezone
+from pathlib import Path
 
 import httpx
-from fastapi import Depends, FastAPI, Header, HTTPException
+from fastapi import Depends, FastAPI, File, Header, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel, Field
 from sqlalchemy import DateTime, ForeignKey, Integer, String, Text, create_engine, select
 from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column, relationship, sessionmaker
+from starlette.concurrency import run_in_threadpool
+
+from transcription import transcribe_audio_file
 
 DATABASE_URL = os.getenv(
     "DATABASE_URL",
@@ -68,6 +73,17 @@ app.add_middleware(
     allow_headers=["*"],
 )
 OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434")
+MAX_AUDIO_SIZE = 50 * 1024 * 1024
+SUPPORTED_AUDIO_TYPES = {
+    "audio/mp4": ".m4a",
+    "audio/mpeg": ".mp3",
+    "audio/mpga": ".mpga",
+    "audio/ogg": ".ogg",
+    "audio/wav": ".wav",
+    "audio/webm": ".webm",
+    "audio/x-m4a": ".m4a",
+    "audio/x-wav": ".wav",
+}
 
 
 class RegisterRequest(BaseModel):
@@ -86,6 +102,19 @@ class PresentationRequest(BaseModel):
     transcript: str
     title: str = Field(default="練習", max_length=200)
     duration_seconds: int = Field(default=0, ge=0)
+
+
+class TranscriptionSegment(BaseModel):
+    start: float
+    end: float
+    text: str
+
+
+class TranscriptionResponse(BaseModel):
+    transcript: str
+    language: str
+    duration_seconds: float
+    segments: list[TranscriptionSegment]
 
 
 def hash_password(password: str, salt: bytes | None = None) -> str:
@@ -210,6 +239,37 @@ def list_practices(user: User = Depends(current_user)):
             }
             for practice in practices
         ]
+
+
+@app.post("/api/transcribe", response_model=TranscriptionResponse)
+async def transcribe(
+    audio: UploadFile = File(...),
+    user: User = Depends(current_user),
+):
+    content_type = (audio.content_type or "").split(";", maxsplit=1)[0].strip().lower()
+    extension = SUPPORTED_AUDIO_TYPES.get(content_type)
+    if extension is None:
+        raise HTTPException(status_code=415, detail="対応していない音声形式です")
+
+    content = await audio.read(MAX_AUDIO_SIZE + 1)
+    if not content:
+        raise HTTPException(status_code=400, detail="音声ファイルが空です")
+    if len(content) > MAX_AUDIO_SIZE:
+        raise HTTPException(status_code=413, detail="音声ファイルは50MB以下にしてください")
+
+    temporary_path: str | None = None
+    try:
+        with tempfile.NamedTemporaryFile(suffix=extension, delete=False) as temporary_file:
+            temporary_file.write(content)
+            temporary_path = temporary_file.name
+
+        result = await run_in_threadpool(transcribe_audio_file, temporary_path)
+    finally:
+        if temporary_path is not None:
+            Path(temporary_path).unlink(missing_ok=True)
+        await audio.close()
+
+    return result
 
 
 @app.post("/api/analyze-content")

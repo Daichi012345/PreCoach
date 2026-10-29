@@ -18,6 +18,17 @@ export type Practice = {
   feedback: string | null
 }
 
+export type Transcription = {
+  transcript: string
+  language: string
+  duration_seconds: number
+  segments: Array<{
+    start: number
+    end: number
+    text: string
+  }>
+}
+
 export function getToken() {
   return window.localStorage.getItem(tokenStorageKey)
 }
@@ -87,4 +98,43 @@ export function getCurrentUser() {
 
 export function getPractices() {
   return request<Practice[]>('/api/practices')
+}
+
+export async function transcribeAudio(audio: Blob) {
+  const formData = new FormData()
+  const extension = audio.type.includes('mp4') ? 'm4a' : 'webm'
+  formData.append('audio', audio, `practice.${extension}`)
+
+  const headers = new Headers()
+  const token = getToken()
+  if (token) {
+    headers.set('Authorization', `Bearer ${token}`)
+  }
+
+  let response: Response
+  try {
+    response = await fetch(`${API_BASE_URL}/api/transcribe`, {
+      method: 'POST',
+      headers,
+      body: formData,
+    })
+  } catch (error) {
+    throw new Error(
+      `音声認識APIに接続できません。バックエンドが起動しているか確認してください（${API_BASE_URL}）`,
+      { cause: error },
+    )
+  }
+
+  const contentType = response.headers.get('content-type') || ''
+  const body = contentType.includes('application/json')
+    ? ((await response.json()) as Transcription | { detail?: string })
+    : undefined
+  if (!response.ok) {
+    throw new Error(
+      typeof body === 'object' && body !== null && 'detail' in body
+        ? body.detail || '音声認識に失敗しました'
+        : '音声認識に失敗しました',
+    )
+  }
+  return body as Transcription
 }

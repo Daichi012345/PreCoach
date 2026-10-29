@@ -176,7 +176,7 @@
   font-size: 9px;
 }
 
-.score-recording-button {
+.transcribe-recording-button {
   display: block;
   margin: 10px 0 0 auto;
   padding: 6px 9px;
@@ -189,9 +189,46 @@
   font-size: 9px;
 }
 
-.score-recording-button:hover {
+.transcribe-recording-button:hover {
   border-color: #111;
   background: #181818;
+}
+
+.transcribe-recording-button:disabled {
+  cursor: wait;
+  opacity: 0.7;
+}
+
+.practice-error {
+  margin: 10px 0 0;
+  color: #b42318;
+  font-size: 12px;
+}
+
+.transcription-result {
+  margin-top: 16px;
+  padding: 18px;
+  border: 1px solid #e1e7ee;
+  border-radius: 10px;
+  background: #fff;
+}
+
+.transcription-result h2 {
+  margin: 0;
+  font-size: 15px;
+}
+
+.transcription-result p {
+  margin: 12px 0;
+  color: #334155;
+  font-size: 14px;
+  line-height: 1.8;
+  white-space: pre-wrap;
+}
+
+.transcription-result small {
+  color: #8290a5;
+  font-size: 11px;
 }
 
 .stop-recording-button:hover:not(:disabled) {
@@ -207,7 +244,7 @@
 .practice-nav a:focus-visible,
 .recording-status-actions a:focus-visible,
 .stop-recording-button:focus-visible,
-.score-recording-button:focus-visible {
+.transcribe-recording-button:focus-visible {
   outline: 3px solid #8da2c2;
   outline-offset: 3px;
 }

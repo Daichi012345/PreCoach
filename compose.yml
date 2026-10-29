@@ -46,9 +46,12 @@ services:
       - "0.0.0.0:8000:8000"
     volumes:
       - ./back:/app
+      - whisper_cache:/root/.cache/huggingface
     environment:
       OLLAMA_URL: http://host.docker.internal:11434
       DATABASE_URL: postgresql+psycopg://precoach_user:${PRECOACH_USER_PASSWORD}@postgres:5432/precoach
+      WHISPER_MODEL_SIZE: ${WHISPER_MODEL_SIZE:-tiny}
+      HF_HOME: /root/.cache/huggingface
       CORS_ORIGINS: ${CORS_ORIGINS:-http://localhost:5173}
       CORS_ORIGIN_REGEX: ${CORS_ORIGIN_REGEX:-https?://(localhost|127\.0\.0\.1|10\.\d+\.\d+\.\d+|192\.168\.\d+\.\d+|172\.(1[6-9]|2\d|3[0-1])\.\d+\.\d+)(:\d+)?}
     command: uvicorn main:app --host 0.0.0.0 --reload
@@ -66,3 +69,4 @@ networks:
 
 volumes:
   postgres_data:
+  whisper_cache:
