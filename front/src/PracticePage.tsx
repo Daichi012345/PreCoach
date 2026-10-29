@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
+import { transcribeAudio, type Transcription } from './api'
 import './PracticePage.css'
 
 const TARGET_SECONDS = 5 * 60
@@ -11,33 +12,98 @@ function formatTime(seconds: number) {
 
 function PracticePage() {
   const [elapsedSeconds, setElapsedSeconds] = useState(0)
-  const [isRecording, setIsRecording] = useState(true)
+  const [isRecording, setIsRecording] = useState(false)
   const [cameraStatus, setCameraStatus] = useState<'checking' | 'connected' | 'denied'>('checking')
+  const [recordingError, setRecordingError] = useState('')
+  const [audioBlob, setAudioBlob] = useState<Blob | null>(null)
+  const [isTranscribing, setIsTranscribing] = useState(false)
+  const [transcription, setTranscription] = useState<Transcription | null>(null)
+  const [transcriptionError, setTranscriptionError] = useState('')
   const videoRef = useRef<HTMLVideoElement>(null)
+  const recorderRef = useRef<MediaRecorder | null>(null)
+  const audioChunksRef = useRef<Blob[]>([])
 
   useEffect(() => {
     let stream: MediaStream | undefined
+    let disposed = false
 
     async function connectCamera() {
       if (!navigator.mediaDevices?.getUserMedia) {
         setCameraStatus('denied')
+        setRecordingError('このブラウザではカメラとマイクを使用できません。')
         return
       }
 
       try {
         stream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true })
+        if (disposed) {
+          stream.getTracks().forEach((track) => track.stop())
+          return
+        }
         if (videoRef.current) {
           videoRef.current.srcObject = stream
         }
+
+        if (stream.getAudioTracks().length === 0) {
+          throw new Error('マイクが見つかりません。マイクを接続してから再読み込みしてください。')
+        }
+
+        const mimeType = [
+          'audio/webm;codecs=opus',
+          'audio/webm',
+          'audio/ogg;codecs=opus',
+          'audio/mp4',
+        ].find((candidate) => MediaRecorder.isTypeSupported(candidate))
+        const audioStream = new MediaStream(stream.getAudioTracks())
+        const recorder = new MediaRecorder(
+          audioStream,
+          mimeType ? { mimeType } : undefined,
+        )
+        audioChunksRef.current = []
+        recorder.addEventListener('dataavailable', (event) => {
+          if (event.data.size > 0) {
+            audioChunksRef.current.push(event.data)
+          }
+        })
+        recorder.addEventListener('stop', () => {
+          const blob = new Blob(audioChunksRef.current, {
+            type: recorder.mimeType || 'audio/webm',
+          })
+          audioChunksRef.current = []
+          if (blob.size > 0) {
+            setAudioBlob(blob)
+          }
+          setIsRecording(false)
+          stream?.getAudioTracks().forEach((track) => track.stop())
+        })
+        recorder.addEventListener('error', () => {
+          setRecordingError('録音中にエラーが発生しました。再読み込みしてやり直してください。')
+          setIsRecording(false)
+        })
+        recorderRef.current = recorder
+        recorder.start()
+        setIsRecording(true)
         setCameraStatus('connected')
-      } catch {
-        setCameraStatus('denied')
+      } catch (error) {
+        if (!disposed) {
+          setCameraStatus('denied')
+          setRecordingError(
+            error instanceof Error
+              ? error.message
+              : 'カメラまたはマイクに接続できません。ブラウザの権限を確認してください。',
+          )
+        }
       }
     }
 
     void connectCamera()
 
     return () => {
+      disposed = true
+      const recorder = recorderRef.current
+      if (recorder?.state === 'recording') {
+        recorder.stop()
+      }
       stream?.getTracks().forEach((track) => track.stop())
     }
   }, [])
@@ -49,8 +115,13 @@ function PracticePage() {
 
     const timer = window.setInterval(() => {
       setElapsedSeconds((current) => {
-        if (current >= TARGET_SECONDS) {
-          setIsRecording(false)
+        if (current + 1 >= TARGET_SECONDS) {
+          const recorder = recorderRef.current
+          if (recorder?.state === 'recording') {
+            recorder.stop()
+          } else {
+            setIsRecording(false)
+          }
           return TARGET_SECONDS
         }
         return current + 1
@@ -59,6 +130,38 @@ function PracticePage() {
 
     return () => window.clearInterval(timer)
   }, [isRecording])
+
+  function stopRecording() {
+    const recorder = recorderRef.current
+    if (recorder?.state === 'recording') {
+      recorder.stop()
+    }
+    setIsRecording(false)
+  }
+
+  async function handleTranscribe() {
+    if (!audioBlob) {
+      return
+    }
+
+    setIsTranscribing(true)
+    setTranscriptionError('')
+    setTranscription(null)
+    try {
+      const result = await transcribeAudio(audioBlob)
+      if (!result.transcript) {
+        setTranscriptionError('音声から発話を認識できませんでした。録音を確認して再度お試しください。')
+        return
+      }
+      setTranscription(result)
+    } catch (error) {
+      setTranscriptionError(
+        error instanceof Error ? error.message : '音声認識に失敗しました。',
+      )
+    } finally {
+      setIsTranscribing(false)
+    }
+  }
 
   return (
     <main className="practice-shell">
@@ -114,24 +217,49 @@ function PracticePage() {
             </p>
           </section>
 
-          <p className="practice-note">録画終了後に結果を確認できます。</p>
+          <p className="practice-note">
+            {isRecording
+              ? '録画終了後、音声を文字起こしできます。'
+              : '録画終了後、音声を文字起こしして内容を確認できます。'}
+          </p>
+          {recordingError && (
+            <p className="practice-error" role="alert">
+              {recordingError}
+            </p>
+          )}
 
           <button
             className="stop-recording-button"
             type="button"
-            onClick={() => setIsRecording(false)}
+            onClick={stopRecording}
             disabled={!isRecording}
           >
             {isRecording ? '録画を終了' : '録画終了済み'}
           </button>
-          {!isRecording && (
+          {audioBlob && (
             <button
-              className="score-recording-button"
+              className="transcribe-recording-button"
               type="button"
-              onClick={() => window.location.assign('/analysis-loading')}
+              onClick={() => void handleTranscribe()}
+              disabled={isTranscribing}
             >
-              AIに採点してもらう
+              {isTranscribing ? '文字起こし中…' : '音声を文字起こし'}
             </button>
+          )}
+          {transcriptionError && (
+            <p className="practice-error" role="alert">
+              {transcriptionError}
+            </p>
+          )}
+          {transcription && (
+            <section className="transcription-result" aria-labelledby="transcription-title">
+              <h2 id="transcription-title">文字起こし結果</h2>
+              <p>{transcription.transcript}</p>
+              <small>
+                認識言語: {transcription.language} ・ 音声の長さ:{' '}
+                {formatTime(Math.round(transcription.duration_seconds))}
+              </small>
+            </section>
           )}
         </section>
 
