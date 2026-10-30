@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
-import { transcribeAudio, type Transcription } from './api'
+import { analyzeContent, transcribeAudio } from './api'
 import './PracticePage.css'
+import './AnalysisLoadingPage.css'
 
 const TARGET_SECONDS = 5 * 60
 
@@ -17,8 +18,9 @@ function PracticePage() {
   const [recordingError, setRecordingError] = useState('')
   const [audioBlob, setAudioBlob] = useState<Blob | null>(null)
   const [isTranscribing, setIsTranscribing] = useState(false)
-  const [transcription, setTranscription] = useState<Transcription | null>(null)
   const [transcriptionError, setTranscriptionError] = useState('')
+  const [isAnalyzing, setIsAnalyzing] = useState(false)
+  const [analysisError, setAnalysisError] = useState('')
   const videoRef = useRef<HTMLVideoElement>(null)
   const recorderRef = useRef<MediaRecorder | null>(null)
   const audioChunksRef = useRef<Blob[]>([])
@@ -72,6 +74,7 @@ function PracticePage() {
           audioChunksRef.current = []
           if (blob.size > 0) {
             setAudioBlob(blob)
+            void processAudioAndAnalyze(blob)
           }
           setIsRecording(false)
           stream?.getAudioTracks().forEach((track) => track.stop())
@@ -139,28 +142,78 @@ function PracticePage() {
     setIsRecording(false)
   }
 
-  async function handleTranscribe() {
-    if (!audioBlob) {
-      return
-    }
-
+  async function processAudioAndAnalyze(blob: Blob) {
+    let phase: 'transcription' | 'analysis' = 'transcription'
     setIsTranscribing(true)
     setTranscriptionError('')
-    setTranscription(null)
+    setAnalysisError('')
     try {
-      const result = await transcribeAudio(audioBlob)
+      const result = await transcribeAudio(blob)
       if (!result.transcript) {
         setTranscriptionError('音声から発話を認識できませんでした。録音を確認して再度お試しください。')
         return
       }
-      setTranscription(result)
-    } catch (error) {
-      setTranscriptionError(
-        error instanceof Error ? error.message : '音声認識に失敗しました。',
+      phase = 'analysis'
+      setIsAnalyzing(true)
+      const analysis = await analyzeContent({
+        transcript: result.transcript,
+        duration_seconds: Math.round(result.duration_seconds),
+      })
+      window.sessionStorage.setItem(
+        'precoach-analysis-result',
+        JSON.stringify({
+          transcript: result.transcript,
+          feedback: analysis.feedback,
+          model: analysis.model,
+          practiceId: analysis.id,
+        }),
       )
+      window.location.replace('/analysis-result')
+    } catch (error) {
+      if (phase === 'transcription') {
+        setTranscriptionError(error instanceof Error ? error.message : '音声認識に失敗しました。')
+      } else {
+        setAnalysisError(error instanceof Error ? error.message : 'LLM評価に失敗しました。')
+      }
     } finally {
       setIsTranscribing(false)
+      setIsAnalyzing(false)
     }
+  }
+
+  async function handleTranscribe() {
+    if (audioBlob) {
+      await processAudioAndAnalyze(audioBlob)
+    }
+  }
+
+  if (isTranscribing || isAnalyzing) {
+    const isTranscribingNow = isTranscribing
+    return (
+      <main className="analysis-loading-shell">
+        <section className="analysis-loading-card" aria-labelledby="loading-title">
+          <div className="analysis-loading-spinner" aria-hidden="true" />
+          <h1 id="loading-title">
+            {isTranscribingNow ? '音声を文字起こししています' : 'LLMが評価を生成しています'}
+          </h1>
+          <p className="analysis-loading-description">
+            {isTranscribingNow
+              ? '録音した音声を解析しています。'
+              : '文字起こし結果をLLMに送信して評価しています。'}
+          </p>
+          <div
+            className="analysis-loading-progress"
+            role="progressbar"
+            aria-label={isTranscribingNow ? '文字起こし中' : 'LLM評価生成中'}
+          >
+            <span />
+          </div>
+          <p className="analysis-loading-note" role="status" aria-live="polite">
+            完了すると分析結果画面に移動します…
+          </p>
+        </section>
+      </main>
+    )
   }
 
   return (
@@ -219,8 +272,8 @@ function PracticePage() {
 
           <p className="practice-note">
             {isRecording
-              ? '録画終了後、音声を文字起こしできます。'
-              : '録画終了後、音声を文字起こしして内容を確認できます。'}
+              ? '録画終了後、音声を文字起こししてLLMで自動評価します。'
+              : '音声の文字起こしとLLM評価を実行しています。'}
           </p>
           {recordingError && (
             <p className="practice-error" role="alert">
@@ -241,9 +294,9 @@ function PracticePage() {
               className="transcribe-recording-button"
               type="button"
               onClick={() => void handleTranscribe()}
-              disabled={isTranscribing}
+              disabled={isTranscribing || isAnalyzing}
             >
-              {isTranscribing ? '文字起こし中…' : '音声を文字起こし'}
+              {isTranscribing ? '文字起こし中…' : isAnalyzing ? 'LLMで評価中…' : '再度LLM評価'}
             </button>
           )}
           {transcriptionError && (
@@ -251,16 +304,13 @@ function PracticePage() {
               {transcriptionError}
             </p>
           )}
-          {transcription && (
-            <section className="transcription-result" aria-labelledby="transcription-title">
-              <h2 id="transcription-title">文字起こし結果</h2>
-              <p>{transcription.transcript}</p>
-              <small>
-                認識言語: {transcription.language} ・ 音声の長さ:{' '}
-                {formatTime(Math.round(transcription.duration_seconds))}
-              </small>
-            </section>
+          {analysisError && (
+            <p className="practice-error" role="alert">
+              {analysisError}
+            </p>
           )}
+          {isTranscribing && <p className="practice-note" role="status">音声を解析しています…</p>}
+          {isAnalyzing && <p className="practice-note" role="status">AIが評価しています…</p>}
         </section>
 
         <footer className="practice-footer">

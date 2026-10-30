@@ -1,6 +1,26 @@
+import { useState } from 'react'
 import './AnalysisResultPage.css'
 
+type AnalysisResult = {
+  transcript: string
+  feedback: string
+  model: string
+  practiceId: number
+}
+
 function AnalysisResultPage() {
+  const [result] = useState<AnalysisResult | null>(() => {
+    const stored = window.sessionStorage.getItem('precoach-analysis-result')
+    if (!stored) {
+      return null
+    }
+    try {
+      return JSON.parse(stored) as AnalysisResult
+    } catch {
+      return null
+    }
+  })
+
   return (
     <main className="analysis-shell">
       <p className="analysis-breadcrumb">PreCoach / 06 分析結果</p>
@@ -51,7 +71,18 @@ function AnalysisResultPage() {
 
           <section className="analysis-card analysis-advice" aria-labelledby="advice-title">
             <h2 id="advice-title">次の練習で意識すること</h2>
-            <p>結論の前で一呼吸置いて、ゆっくり話しましょう。</p>
+            <p>{result?.feedback || '評価結果を取得できませんでした。練習履歴を確認してください。'}</p>
+          </section>
+
+          <section className="analysis-card analysis-transcript" aria-labelledby="transcript-title">
+            <h2 id="transcript-title">音声の文字起こし結果</h2>
+            <p>{result?.transcript || '文字起こし結果を取得できませんでした。'}</p>
+          </section>
+
+          <section className="analysis-card analysis-llm" aria-labelledby="llm-title">
+            <h2 id="llm-title">LLMに送信した評価結果</h2>
+            <p>{result?.feedback || 'LLM評価結果を取得できませんでした。'}</p>
+            {result?.model && <small>使用モデル: {result.model}</small>}
           </section>
 
           <section className="analysis-card analysis-recording" aria-label="録画の確認">

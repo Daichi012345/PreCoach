@@ -138,3 +138,14 @@ export async function transcribeAudio(audio: Blob) {
   }
   return body as Transcription
 }
+
+export async function analyzeContent(data: {
+  transcript: string
+  title?: string
+  duration_seconds?: number
+}) {
+  return request<{ id: number; model: string; transcript: string; feedback: string }>('/api/analyze-content', {
+    method: 'POST',
+    body: JSON.stringify(data),
+  })
+}
