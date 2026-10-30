@@ -321,4 +321,9 @@ async def analyze_content(
         db.add(practice)
         db.commit()
         db.refresh(practice)
-        return {"id": practice.id, "model": "gemma3:4b", "feedback": feedback}
+        return {
+            "id": practice.id,
+            "model": "gemma3:4b",
+            "transcript": data.transcript,
+            "feedback": feedback,
+        }
