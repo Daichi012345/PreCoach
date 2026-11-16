@@ -2,6 +2,8 @@ import os
 from threading import Lock
 from typing import Any
 
+from voice_metrics import analyze_voice_metrics
+
 _model: Any | None = None
 _model_lock = Lock()
 
@@ -38,9 +40,17 @@ def transcribe_audio_file(audio_path: str) -> dict[str, Any]:
         for segment in segments
     ]
 
+    transcript = "".join(segment["text"] for segment in transcript_segments).strip()
+    duration_seconds = float(info.duration)
+
     return {
-        "transcript": "".join(segment["text"] for segment in transcript_segments).strip(),
+        "transcript": transcript,
         "language": info.language,
-        "duration_seconds": float(info.duration),
+        "duration_seconds": duration_seconds,
         "segments": transcript_segments,
+        "voice_metrics": analyze_voice_metrics(
+            transcript,
+            transcript_segments,
+            duration_seconds,
+        ),
     }

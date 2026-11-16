@@ -1,5 +1,6 @@
 import hashlib
 import hmac
+import logging
 import os
 import secrets
 import tempfile
@@ -73,6 +74,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434")
+logger = logging.getLogger(__name__)
 MAX_AUDIO_SIZE = 50 * 1024 * 1024
 SUPPORTED_AUDIO_TYPES = {
     "audio/mp4": ".m4a",
@@ -98,10 +100,23 @@ class LoginRequest(BaseModel):
     password: str
 
 
+class VoiceMetrics(BaseModel):
+    spoken_character_count: int = Field(ge=0)
+    speech_duration_seconds: float = Field(ge=0)
+    speaking_rate_characters_per_minute: float = Field(ge=0)
+    estimated_silence_seconds: float = Field(ge=0)
+    estimated_silence_ratio_percent: float = Field(ge=0, le=100)
+    long_pause_count: int = Field(ge=0)
+    filler_count: int = Field(ge=0)
+    filler_per_minute: float = Field(ge=0)
+    repeated_phrase_count: int = Field(ge=0)
+
+
 class PresentationRequest(BaseModel):
     transcript: str
     title: str = Field(default="練習", max_length=200)
     duration_seconds: int = Field(default=0, ge=0)
+    voice_metrics: VoiceMetrics | None = None
 
 
 class TranscriptionSegment(BaseModel):
@@ -115,6 +130,7 @@ class TranscriptionResponse(BaseModel):
     language: str
     duration_seconds: float
     segments: list[TranscriptionSegment]
+    voice_metrics: VoiceMetrics
 
 
 def hash_password(password: str, salt: bytes | None = None) -> str:
@@ -279,17 +295,28 @@ async def analyze_content(
 ):
     if not data.transcript.strip():
         raise HTTPException(status_code=400, detail="文字起こし結果が空です")
+    metrics_prompt = ""
+    if data.voice_metrics is not None:
+        metrics = data.voice_metrics
+        metrics_prompt = f"""音声指標（自動推定値）：
+- 発話中の話速：{metrics.speaking_rate_characters_per_minute}文字/分
+- 推定沈黙割合：{metrics.estimated_silence_ratio_percent}%、1秒以上の間：{metrics.long_pause_count}回
+- フィラー候補：{metrics.filler_count}回（{metrics.filler_per_minute}回/分）
+- 繰り返し表現候補：{metrics.repeated_phrase_count}箇所
+"""
     prompt = f"""あなたはプレゼン指導AIです。
 以下の発表内容を日本語で評価してください。
 必ず次の形式で簡潔に回答してください。
 【良かった点】
 1文で回答
 【改善点】
-1文で回答
+1文で回答。音声指標がある場合は、指標に基づく改善点を含める
 【次回のアドバイス】
 1文で回答
 全体で150文字以内にしてください。
 発表内容にない情報は推測しないでください。
+音声指標は自動推定値であり、厳密な無音・言いよどみ判定ではありません。指標が示していない抑揚や声量は評価しないでください。
+{metrics_prompt}
 発表内容：
 {data.transcript}"""
     try:
@@ -307,8 +334,20 @@ async def analyze_content(
             response.raise_for_status()
             feedback = response.json()["response"]
     except httpx.TimeoutException as exc:
+        logger.error("Ollama request timed out: %s", exc)
         raise HTTPException(status_code=504, detail="Ollamaの応答がタイムアウトしました") from exc
-    except (httpx.HTTPError, KeyError) as exc:
+    except httpx.HTTPStatusError as exc:
+        logger.error(
+            "Ollama returned HTTP %s: %s",
+            exc.response.status_code,
+            exc.response.text,
+        )
+        raise HTTPException(status_code=503, detail="Ollamaとの通信に失敗しました") from exc
+    except httpx.RequestError as exc:
+        logger.error("Failed to connect to Ollama: %s", exc)
+        raise HTTPException(status_code=503, detail="Ollamaとの通信に失敗しました") from exc
+    except KeyError as exc:
+        logger.error("Ollama response is missing the expected field: %s", exc)
         raise HTTPException(status_code=503, detail="Ollamaとの通信に失敗しました") from exc
 
     with SessionLocal() as db:

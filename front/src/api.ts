@@ -1,6 +1,6 @@
 const API_BASE_URL =
   import.meta.env.VITE_API_BASE_URL ||
-  `${window.location.protocol}//${window.location.hostname}:8000`
+  window.location.origin
 const tokenStorageKey = 'precoach-token'
 
 export type User = {
@@ -18,10 +18,23 @@ export type Practice = {
   feedback: string | null
 }
 
+export type VoiceMetrics = {
+  spoken_character_count: number
+  speech_duration_seconds: number
+  speaking_rate_characters_per_minute: number
+  estimated_silence_seconds: number
+  estimated_silence_ratio_percent: number
+  long_pause_count: number
+  filler_count: number
+  filler_per_minute: number
+  repeated_phrase_count: number
+}
+
 export type Transcription = {
   transcript: string
   language: string
   duration_seconds: number
+  voice_metrics: VoiceMetrics
   segments: Array<{
     start: number
     end: number
@@ -143,6 +156,7 @@ export async function analyzeContent(data: {
   transcript: string
   title?: string
   duration_seconds?: number
+  voice_metrics?: VoiceMetrics
 }) {
   return request<{ id: number; model: string; transcript: string; feedback: string }>('/api/analyze-content', {
     method: 'POST',
