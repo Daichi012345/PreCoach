@@ -94,7 +94,17 @@ npm run dev
 docker compose up -d --build back
 ```
 
-この段階では文字起こし結果を画面に表示するところまでです。ローカルLLMによる採点とはまだ接続していません。
+### プレゼン評価のRAG
+
+評価時は `back/knowledge/*.md` の評価基準をOllamaのEmbeddingモデルで検索し、関連する資料を採点プロンプトへ渡します。評価基準を追加・修正する場合はMarkdownファイルを追加してください。
+
+初回利用前にEmbeddingモデルを取得してください。
+
+```powershell
+ollama pull nomic-embed-text
+```
+
+採点用モデル（既存）とEmbeddingモデルの両方をOllamaで起動できる状態にしてください。
 
 ### 同じネットワークの別端末からアクセスする
 
