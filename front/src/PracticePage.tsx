@@ -158,11 +158,13 @@ function PracticePage() {
       const analysis = await analyzeContent({
         transcript: result.transcript,
         duration_seconds: Math.round(result.duration_seconds),
+        voice_metrics: result.voice_metrics,
       })
       window.sessionStorage.setItem(
         'precoach-analysis-result',
         JSON.stringify({
           transcript: result.transcript,
+          voiceMetrics: result.voice_metrics,
           feedback: analysis.feedback,
           model: analysis.model,
           practiceId: analysis.id,

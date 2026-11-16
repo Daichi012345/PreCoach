@@ -30,6 +30,12 @@ class TranscribeAudioFileTests(unittest.TestCase):
                 {"start": 1.25, "end": 2.5, "text": "発表します。"},
             ],
         )
+        self.assertEqual(result["voice_metrics"]["spoken_character_count"], 8)
+        self.assertEqual(result["voice_metrics"]["speech_duration_seconds"], 2.5)
+        self.assertEqual(
+            result["voice_metrics"]["speaking_rate_characters_per_minute"],
+            192.0,
+        )
         model.transcribe.assert_called_once_with(
             "sample.webm",
             language="ja",

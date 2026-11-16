@@ -1,8 +1,10 @@
 import { useState } from 'react'
+import type { VoiceMetrics } from './api'
 import './AnalysisResultPage.css'
 
 type AnalysisResult = {
   transcript: string
+  voiceMetrics: VoiceMetrics
   feedback: string
   model: string
   practiceId: number
@@ -43,31 +45,48 @@ function AnalysisResultPage() {
         <section className="analysis-content" aria-labelledby="analysis-title">
           <h1 id="analysis-title">分析結果</h1>
 
-          <section className="analysis-card analysis-score" aria-label="総合スコア">
-            <strong>総合スコア 78 / 100</strong>
-            <span aria-hidden="true">|</span>
-            <strong>前回比 +6点</strong>
-            <span aria-hidden="true">|</span>
-            <strong>初回比 +10点</strong>
-          </section>
-
-          <section className="analysis-card analysis-categories" aria-label="項目別スコア">
-            <div className="category-scores">
-              <strong>目線 62</strong>
-              <span aria-hidden="true">/</span>
-              <strong>姿勢 86</strong>
-              <span aria-hidden="true">/</span>
-              <strong>話し方 71</strong>
-            </div>
-            <p>声量 83&nbsp;&nbsp; / &nbsp;&nbsp;時間 94&nbsp;&nbsp; / &nbsp;&nbsp;内容 82</p>
-          </section>
-
-          <section className="analysis-card analysis-improvements" aria-labelledby="improvements-title">
-            <h2 id="improvements-title">前回の指摘は改善できた？（サンプル）</h2>
-            <p>話す速度：360 → 312文字/分&nbsp;&nbsp; | &nbsp;&nbsp;改善&nbsp;&nbsp; | &nbsp;&nbsp;目標 280〜320</p>
-            <p>目線：正面を向く割合 45% → 58%&nbsp;&nbsp; | &nbsp;&nbsp;改善中&nbsp;&nbsp; | &nbsp;&nbsp;目標 70%</p>
-            <p>フィラー：8 → 5回/分&nbsp;&nbsp; | &nbsp;&nbsp;改善中&nbsp;&nbsp; | &nbsp;&nbsp;目標 3回/分</p>
-          </section>
+          {result?.voiceMetrics && (
+            <section className="analysis-card analysis-voice-metrics" aria-labelledby="voice-metrics-title">
+              <h2 id="voice-metrics-title">話し方の指標</h2>
+              <dl className="voice-metrics-grid">
+                <div>
+                  <dt>発話中の話速</dt>
+                  <dd>{result.voiceMetrics.speaking_rate_characters_per_minute} 文字/分</dd>
+                </div>
+                <div>
+                  <dt>推定沈黙時間 / 割合</dt>
+                  <dd>
+                    {result.voiceMetrics.estimated_silence_seconds} 秒 /{' '}
+                    {result.voiceMetrics.estimated_silence_ratio_percent}%
+                  </dd>
+                </div>
+                <div>
+                  <dt>1秒以上の間</dt>
+                  <dd>{result.voiceMetrics.long_pause_count} 回</dd>
+                </div>
+                <div>
+                  <dt>フィラー候補</dt>
+                  <dd>
+                    {result.voiceMetrics.filler_count} 回（{result.voiceMetrics.filler_per_minute} 回/分）
+                  </dd>
+                </div>
+                <div>
+                  <dt>繰り返し表現候補</dt>
+                  <dd>{result.voiceMetrics.repeated_phrase_count} 箇所</dd>
+                </div>
+                <div>
+                  <dt>発話文字数 / 発話時間</dt>
+                  <dd>
+                    {result.voiceMetrics.spoken_character_count} 文字 /{' '}
+                    {result.voiceMetrics.speech_duration_seconds} 秒
+                  </dd>
+                </div>
+              </dl>
+              <p className="voice-metrics-note">
+                文字起こしと発話区間からの自動推定です。沈黙・フィラー・繰り返しの判定には誤差があります。
+              </p>
+            </section>
+          )}
 
           <section className="analysis-card analysis-advice" aria-labelledby="advice-title">
             <h2 id="advice-title">次の練習で意識すること</h2>
@@ -85,11 +104,6 @@ function AnalysisResultPage() {
             {result?.model && <small>使用モデル: {result.model}</small>}
           </section>
 
-          <section className="analysis-card analysis-recording" aria-label="録画の確認">
-            <h2>02:13&nbsp; 画面を見る時間が長い → 録画を確認</h2>
-            <p>03:20&nbsp; 話す速度が上がる → 録画を確認</p>
-          </section>
-
           <a
             className="analysis-repeat-button"
             href="/practice-settings"
@@ -101,7 +115,7 @@ function AnalysisResultPage() {
         <footer className="analysis-footer">
           <span>WIREFRAME v0.1</span>
           <span aria-hidden="true">|</span>
-          <span>表示データはサンプル</span>
+          <span>音声指標は自動推定値</span>
           <span aria-hidden="true">|</span>
           <span>PC 1200px</span>
         </footer>

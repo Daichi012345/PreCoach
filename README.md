@@ -11,9 +11,9 @@ Docker Desktopを起動した状態で、プロジェクトのルートディレ
 ```dotenv
 POSTGRES_PASSWORD=admin
 PRECOACH_USER_PASSWORD=admin
-VITE_HOST=10.200.5.86
+VITE_HOST=0.0.0.0
 VITE_PORT=5173
-VITE_API_BASE_URL=http://10.200.5.86:8000
+VITE_API_BASE_URL=
 CORS_ORIGINS=http://localhost:5173
 ```
 
@@ -69,13 +69,13 @@ PostgreSQLは `localhost:5432` のみで待ち受け、Docker内の他サービ�
 起動後は以下のURLを開いてください。
 
 - フロントエンド: http://localhost:5173
-- バックエンドAPI: http://localhost:8000
+- APIリクエストはフロントエンド経由でバックエンドに転送されます。
 
-別端末からアクセスする場合は、`.env` の `CORS_ORIGINS` にフロントエンドのURLを指定してください（例: `CORS_ORIGINS=http://192.168.1.10:5173`）。
+バックエンドAPIへ直接アクセスする場合は http://localhost:8000 を使用できます。
 
-`.env` の `CORS_ORIGIN_REGEX` はLAN内のIPアドレスを初期値で許可しています。起動後、`ipconfig` で確認したPCのIPv4アドレスを使って `http://<IPv4アドレス>:5173` を開いてください。フロントエンドは開いたホストのIPアドレスを自動的にAPI接続先として使用します。
+`ipconfig` で確認したPCのIPv4アドレスを使って `http://<IPv4アドレス>:5173` を開くと、APIリクエストも同じホストの5173番ポートを経由します。
 
-`npm run dev` を使う場合は、フロントエンドディレクトリで実行します。`.env` の `VITE_HOST`、`VITE_PORT`、`VITE_API_BASE_URL` を変更すると、待受IP・ポート・API接続先を変更できます。例:
+`VITE_API_BASE_URL` を空欄にすると、ブラウザーで開いたURL（5173番ポート）をAPI接続先として使います。別のURLを指定する場合も、ViteのAPIプロキシを利用するにはフロントエンドの5173番ポートを指定してください。`npm run dev` でDocker外から起動するときは、プロキシ先は既定で `http://localhost:8000` です。
 
 ```powershell
 cd front
@@ -107,9 +107,9 @@ ipconfig
 例えばローカルIPが `192.168.1.10` の場合、別端末のブラウザーから以下にアクセスします。
 
 - フロントエンド: http://192.168.1.10:5173
-- バックエンドAPI: http://192.168.1.10:8000
+- APIリクエストはフロントエンドの5173番ポート経由でバックエンドに転送されます。
 
-接続できない場合は、Windows Defender ファイアウォールでTCPポート `5173` と `8000` の受信を許可してください。また、接続する端末が同じWi-FiまたはLANに接続されていることを確認してください。
+接続できない場合は、Windows Defender ファイアウォールでTCPポート `5173` の受信を許可してください。また、接続する端末が同じWi-FiまたはLANに接続されていることを確認してください。
 
 バックグラウンドで起動する場合は `-d` を付けます。
 
