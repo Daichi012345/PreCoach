@@ -16,6 +16,7 @@ from sqlalchemy.exc import IntegrityError
 from sqlalchemy.orm import DeclarativeBase, Mapped, Session, mapped_column, relationship, sessionmaker
 from starlette.concurrency import run_in_threadpool
 
+from rag import retrieve_guidance
 from transcription import transcribe_audio_file
 
 DATABASE_URL = os.getenv(
@@ -74,6 +75,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 OLLAMA_URL = os.getenv("OLLAMA_URL", "http://localhost:11434")
+OLLAMA_EMBEDDING_MODEL = os.getenv("OLLAMA_EMBEDDING_MODEL", "nomic-embed-text")
+KNOWLEDGE_DIR = Path(
+    os.getenv("RAG_KNOWLEDGE_DIR", str(Path(__file__).parent / "knowledge"))
+)
+RAG_TOP_K = int(os.getenv("RAG_TOP_K", "3"))
+RAG_MAX_CONTEXT_CHARS = int(os.getenv("RAG_MAX_CONTEXT_CHARS", "3000"))
 logger = logging.getLogger(__name__)
 MAX_AUDIO_SIZE = 50 * 1024 * 1024
 SUPPORTED_AUDIO_TYPES = {
@@ -304,7 +311,29 @@ async def analyze_content(
 - フィラー候補：{metrics.filler_count}回（{metrics.filler_per_minute}回/分）
 - 繰り返し表現候補：{metrics.repeated_phrase_count}箇所
 """
+    try:
+        guidance = await run_in_threadpool(
+            retrieve_guidance,
+            data.transcript,
+            KNOWLEDGE_DIR,
+            ollama_url=OLLAMA_URL,
+            embedding_model=OLLAMA_EMBEDDING_MODEL,
+            top_k=RAG_TOP_K,
+            max_context_chars=RAG_MAX_CONTEXT_CHARS,
+        )
+    except (httpx.HTTPError, KeyError, ValueError) as exc:
+        logger.error("Failed to retrieve RAG guidance: %s", exc)
+        raise HTTPException(
+            status_code=503,
+            detail="Embeddingモデルによる資料検索に失敗しました",
+        ) from exc
+
+    retrieved_context = guidance or "関連する評価資料はありません。一般的な基準で評価してください。"
     prompt = f"""あなたはプレゼン指導AIです。
+以下の評価資料を参考にしてください。資料にない内容を事実として扱わず、発表内容を最優先してください。
+--- 評価資料 ---
+{retrieved_context}
+--- 評価資料ここまで ---
 以下の発表内容を日本語で評価してください。
 必ず次の形式で簡潔に回答してください。
 【良かった点】
