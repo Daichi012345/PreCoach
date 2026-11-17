@@ -47,9 +47,6 @@ function DashboardPage() {
             <a href="/practice-settings">
               <span aria-hidden="true">＋</span> 練習を始める
             </a>
-            <a href="/practice-history">
-              <span aria-hidden="true">▣</span> 練習履歴
-            </a>
             <a href="/analysis-result">
               <span aria-hidden="true">⌁</span> 分析結果
             </a>
@@ -132,7 +129,6 @@ function DashboardPage() {
             <section className="dashboard-panel activity-panel" aria-labelledby="activity-title">
               <div className="dashboard-panel-heading">
                 <h2 id="activity-title">最近の練習履歴</h2>
-                <a href="/practice-history">すべて見る</a>
               </div>
               <div className="dashboard-activity-list">
                 {latestPractices.length === 0 ? (

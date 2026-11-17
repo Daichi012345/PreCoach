@@ -8,7 +8,6 @@ import GrowthRecordPage from './GrowthRecordPage.tsx'
 import LoginPage from './LoginPage.tsx'
 import MyPage from './MyPage.tsx'
 import PracticePage from './PracticePage.tsx'
-import PracticeHistoryPage from './PracticeHistoryPage.tsx'
 import PracticeSettingsPage from './PracticeSettingsPage.tsx'
 import RegisterPage from './RegisterPage.tsx'
 import UpgradePage from './UpgradePage.tsx'
@@ -26,8 +25,6 @@ const Page =
       ? AnalysisLoadingPage
     : route === '/practice'
       ? PracticePage
-    : route === '/practice-history'
-      ? PracticeHistoryPage
     : route === '/practice-settings'
       ? PracticeSettingsPage
     : route === '/upgrade'
@@ -49,8 +46,6 @@ document.title =
       ? 'PreCoach | AI採点中'
     : route === '/practice'
       ? 'PreCoach | 発表・録画'
-    : route === '/practice-history'
-      ? 'PreCoach | 練習履歴'
     : route === '/practice-settings'
       ? 'PreCoach | 練習設定'
     : route === '/upgrade'
