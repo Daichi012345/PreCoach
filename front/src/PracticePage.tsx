@@ -232,8 +232,6 @@ function PracticePage() {
             <span aria-hidden="true">/</span>
             <a href="/practice-settings">練習設定</a>
             <span aria-hidden="true">/</span>
-            <a href="/practice-history">練習履歴</a>
-            <span aria-hidden="true">/</span>
             <a href="/practice-settings">設定</a>
           </nav>
         </header>
