@@ -41,7 +41,7 @@ function RegisterPage() {
         </a>
         <p className="brand-tagline">AIと練習して、伝わるプレゼンへ。</p>
         <nav className="page-navigation" aria-label="ページ">
-          <a href="/dashboard">Dashboard</a>
+          <a href="/dashboard">ホーム</a>
           <span aria-hidden="true">/</span>
           <a href="/login">Login</a>
         </nav>
