@@ -83,6 +83,15 @@ RAG_TOP_K = int(os.getenv("RAG_TOP_K", "3"))
 RAG_MAX_CONTEXT_CHARS = int(os.getenv("RAG_MAX_CONTEXT_CHARS", "3000"))
 logger = logging.getLogger(__name__)
 MAX_AUDIO_SIZE = 50 * 1024 * 1024
+
+MAX_VIDEO_SIZE = 200 * 1024 * 1024
+
+SUPPORTED_VIDEO_TYPES = {
+    "video/webm": ".webm",
+    "video/mp4": ".mp4",
+    "video/quicktime": ".mov",
+}
+
 SUPPORTED_AUDIO_TYPES = {
     "audio/mp4": ".m4a",
     "audio/mpeg": ".mp3",
@@ -294,6 +303,64 @@ async def transcribe(
 
     return result
 
+@app.post("/api/upload-video")
+async def upload_video(
+    video: UploadFile = File(...),
+    user: User = Depends(current_user),
+):
+    content_type = (video.content_type or "").split(";", maxsplit=1)[0].strip().lower()
+    extension = SUPPORTED_VIDEO_TYPES.get(content_type)
+
+    if extension is None:
+        raise HTTPException(
+            status_code=415,
+            detail="対応していない動画形式です",
+        )
+
+    content = await video.read(MAX_VIDEO_SIZE + 1)
+
+    if not content:
+        raise HTTPException(
+            status_code=400,
+            detail="動画ファイルが空です",
+        )
+
+    if len(content) > MAX_VIDEO_SIZE:
+        raise HTTPException(
+            status_code=413,
+            detail="動画ファイルは200MB以下にしてください",
+        )
+
+    temporary_path = None
+
+    try:
+        with tempfile.NamedTemporaryFile(
+            suffix=extension,
+            delete=False,
+        ) as temporary_file:
+            temporary_file.write(content)
+            temporary_path = temporary_file.name
+
+        logger.info(
+            "Video received: size=%s bytes, user_id=%s",
+            len(content),
+            user.id,
+        )
+
+        return {
+            "message": "動画を正常に受信しました",
+            "filename": video.filename,
+            "content_type": content_type,
+            "size": len(content),
+        }
+
+    finally:
+        if temporary_path is not None:
+            Path(temporary_path).unlink(missing_ok=True)
+
+        await video.close()
+
+        
 
 @app.post("/api/analyze-content")
 async def analyze_content(

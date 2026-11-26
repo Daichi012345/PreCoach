@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react'
-import { analyzeContent, transcribeAudio } from './api'
+import { analyzeContent, transcribeAudio, uploadVideo } from './api'
 import './PracticePage.css'
 import './AnalysisLoadingPage.css'
 
@@ -22,8 +22,21 @@ function PracticePage() {
   const [isAnalyzing, setIsAnalyzing] = useState(false)
   const [analysisError, setAnalysisError] = useState('')
   const videoRef = useRef<HTMLVideoElement>(null)
-  const recorderRef = useRef<MediaRecorder | null>(null)
-  const audioChunksRef = useRef<Blob[]>([])
+
+    // 音声録画用
+    const recorderRef = useRef<MediaRecorder | null>(null)
+    const audioChunksRef = useRef<Blob[]>([])
+
+    // 動画録画用
+    const videoRecorderRef = useRef<MediaRecorder | null>(null)
+    const videoChunksRef = useRef<Blob[]>([])
+
+    // 音声・動画の保存完了を管理
+    const audioBlobRef = useRef<Blob | null>(null)
+    const videoBlobRef = useRef<Blob | null>(null)
+
+    // 解析の二重実行を防止
+    const analysisStartedRef = useRef(false)
 
   useEffect(() => {
     let stream: MediaStream | undefined
@@ -67,26 +80,81 @@ function PracticePage() {
             audioChunksRef.current.push(event.data)
           }
         })
+
         recorder.addEventListener('stop', () => {
-          const blob = new Blob(audioChunksRef.current, {
-            type: recorder.mimeType || 'audio/webm',
-          })
-          audioChunksRef.current = []
-          if (blob.size > 0) {
-            setAudioBlob(blob)
-            void processAudioAndAnalyze(blob)
-          }
-          setIsRecording(false)
-          stream?.getAudioTracks().forEach((track) => track.stop())
+        const blob = new Blob(audioChunksRef.current, {
+          type: recorder.mimeType || 'audio/webm',
         })
+
+        audioChunksRef.current = []
+
+        if (blob.size > 0) {
+          setAudioBlob(blob)
+          audioBlobRef.current = blob
+          checkRecordingComplete()
+        }
+
+        setIsRecording(false)
+        stream?.getAudioTracks().forEach((track) => track.stop())
+      })
+
+
         recorder.addEventListener('error', () => {
           setRecordingError('録音中にエラーが発生しました。再読み込みしてやり直してください。')
           setIsRecording(false)
         })
-        recorderRef.current = recorder
-        recorder.start()
-        setIsRecording(true)
-        setCameraStatus('connected')
+        // 音声録画用MediaRecorderを保存
+          recorderRef.current = recorder
+
+          // 動画録画用のMediaStreamを作成
+          const videoStream = new MediaStream(stream.getVideoTracks())
+
+          // ブラウザが対応している動画形式を選択
+          const videoMimeType = [
+            'video/webm;codecs=vp8',
+            'video/webm',
+          ].find((candidate) => MediaRecorder.isTypeSupported(candidate))
+
+          // 動画録画用MediaRecorderを作成
+          const videoRecorder = new MediaRecorder(
+            videoStream,
+            videoMimeType ? { mimeType: videoMimeType } : undefined,
+          )
+
+          // 動画データを初期化
+          videoChunksRef.current = []
+
+          // 録画データを受け取る
+          videoRecorder.addEventListener('dataavailable', (event) => {
+            if (event.data.size > 0) {
+              videoChunksRef.current.push(event.data)
+            }
+          })
+
+          // 録画終了時に動画データをまとめる
+          videoRecorder.addEventListener('stop', () => {
+          const blob = new Blob(videoChunksRef.current, {
+            type: videoRecorder.mimeType || 'video/webm',
+          })
+
+          videoChunksRef.current = []
+
+          if (blob.size > 0) {
+            videoBlobRef.current = blob
+            checkRecordingComplete()
+          }
+        })
+
+          // 動画録画用MediaRecorderを保存
+          videoRecorderRef.current = videoRecorder
+
+          // 音声・動画の録画を同時に開始
+          recorder.start()
+          videoRecorder.start()
+
+          // 録画状態に変更
+          setIsRecording(true)
+          setCameraStatus('connected')
       } catch (error) {
         if (!disposed) {
           setCameraStatus('denied')
@@ -134,13 +202,84 @@ function PracticePage() {
     return () => window.clearInterval(timer)
   }, [isRecording])
 
-  function stopRecording() {
-    const recorder = recorderRef.current
-    if (recorder?.state === 'recording') {
-      recorder.stop()
+    // 録画停止処理
+    function stopRecording() {
+      // 音声録画を停止
+      const audioRecorder = recorderRef.current
+      if (audioRecorder?.state === 'recording') {
+        audioRecorder.stop()
+      }
+
+      // 動画録画を停止
+      const videoRecorder = videoRecorderRef.current
+      if (videoRecorder?.state === 'recording') {
+        videoRecorder.stop()
+      }
+
+      // 録画状態を終了に変更
+      setIsRecording(false)
     }
-    setIsRecording(false)
+
+//録画ができているか確認のためのダウンロード処理
+function downloadBlob(blob: Blob, filename: string) {
+  const url = URL.createObjectURL(blob)
+  const link = document.createElement('a')
+
+  link.href = url
+  link.download = filename
+  link.click()
+
+  URL.revokeObjectURL(url)
+}
+
+//録画ができているか確認のためのダウンロード処理
+function downloadRecordings() {
+  const audioBlob = audioBlobRef.current
+  const videoBlob = videoBlobRef.current
+
+  if (audioBlob) {
+    downloadBlob(audioBlob, 'precoach-audio.webm')
   }
+
+  if (videoBlob) {
+    downloadBlob(videoBlob, 'precoach-video.webm')
+  }
+}
+
+    // 音声・動画の保存完了を確認
+function checkRecordingComplete() {
+  const audioBlob = audioBlobRef.current
+  const videoBlob = videoBlobRef.current
+
+  // 両方の保存が完了するまで待機
+  if (!audioBlob || !videoBlob) {
+    return
+  }
+
+  // 解析の二重実行を防止
+  if (analysisStartedRef.current) {
+    return
+  }
+
+  analysisStartedRef.current = true
+
+  // 動画をバックエンドへ送信
+  void uploadVideo(videoBlob)
+    .then((result) => {
+      console.log('動画アップロード成功:', result)
+    })
+    .catch((error) => {
+      console.error('動画アップロード失敗:', error)
+      setRecordingError(
+        error instanceof Error
+          ? error.message
+          : '動画のアップロードに失敗しました。',
+      )
+    })
+
+  // 音声解析・LLM評価を開始
+  void processAudioAndAnalyze(audioBlob)
+}
 
   async function processAudioAndAnalyze(blob: Blob) {
     let phase: 'transcription' | 'analysis' = 'transcription'
@@ -289,6 +428,14 @@ function PracticePage() {
           >
             {isRecording ? '録画を終了' : '録画終了済み'}
           </button>
+          
+          {/* 録画ができているか確認のための動画ダウンロードボタン */}
+          <button
+          onClick={downloadRecordings}
+          disabled={!audioBlobRef.current || !videoBlobRef.current}
+        >
+          録音・録画ファイルをダウンロード
+        </button>
           {audioBlob && (
             <button
               className="transcribe-recording-button"
