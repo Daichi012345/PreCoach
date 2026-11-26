@@ -30,7 +30,7 @@ function LoginPage() {
         </a>
         <p className="brand-tagline">AIと練習して、伝わるプレゼンへ。</p>
         <nav className="page-navigation" aria-label="ページ">
-          <a href="/dashboard">Dashboard</a>
+          <a href="/dashboard">ホーム</a>
           <span aria-hidden="true">/</span>
           <a href="/register">新規登録</a>
         </nav>

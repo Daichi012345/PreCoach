@@ -367,7 +367,7 @@ function checkRecordingComplete() {
             PreCoach
           </a>
           <nav className="practice-nav" aria-label="ページ">
-            <a href="/dashboard">Dashboard</a>
+            <a href="/dashboard">ホーム</a>
             <span aria-hidden="true">/</span>
             <a href="/practice-settings">練習設定</a>
             <span aria-hidden="true">/</span>
