@@ -163,3 +163,51 @@ export async function analyzeContent(data: {
     body: JSON.stringify(data),
   })
 }
+export async function uploadVideo(video: Blob) {
+  const formData = new FormData()
+
+  const extension = video.type.includes('mp4') ? 'mp4' : 'webm'
+  formData.append('video', video, `practice.${extension}`)
+
+  const headers = new Headers()
+  const token = getToken()
+
+  if (token) {
+    headers.set('Authorization', `Bearer ${token}`)
+  }
+
+  let response: Response
+
+  try {
+    response = await fetch(`${API_BASE_URL}/api/upload-video`, {
+      method: 'POST',
+      headers,
+      body: formData,
+    })
+  } catch (error) {
+    throw new Error(
+      `動画アップロードAPIに接続できません。バックエンドが起動しているか確認してください（${API_BASE_URL}）`,
+      { cause: error },
+    )
+  }
+
+  const contentType = response.headers.get('content-type') || ''
+  const body = contentType.includes('application/json')
+    ? await response.json()
+    : undefined
+
+  if (!response.ok) {
+    throw new Error(
+      typeof body === 'object' && body !== null && 'detail' in body
+        ? body.detail || '動画アップロードに失敗しました'
+        : '動画アップロードに失敗しました',
+    )
+  }
+
+  return body as {
+    message: string
+    filename: string
+    content_type: string
+    size: number
+  }
+}
